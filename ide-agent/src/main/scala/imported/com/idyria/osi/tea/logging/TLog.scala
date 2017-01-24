@@ -1,4 +1,4 @@
-package com.idyria.osi.tea.logging
+package imported.com.idyria.osi.tea.logging
 
 import scala.collection.SortedMap
 import scala.util.matching.Regex

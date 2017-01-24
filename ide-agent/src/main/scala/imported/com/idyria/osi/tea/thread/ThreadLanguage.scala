@@ -1,4 +1,4 @@
-package com.idyria.osi.tea.thread
+package imported.com.idyria.osi.tea.thread
 
 /**
  * A trait to provide a few utility methods to run code on Threads

@@ -1,4 +1,4 @@
-package com.idyria.osi.tea.files
+package imported.com.idyria.osi.tea.files
 
 import java.io.File
 import java.lang.ref.WeakReference
@@ -11,8 +11,8 @@ import java.nio.file.WatchKey
 
 import scala.collection.JavaConversions._
 
-import com.idyria.osi.tea.logging.TLogSource
-import com.idyria.osi.tea.thread.ThreadLanguage
+import imported.com.idyria.osi.tea.logging.TLogSource
+import imported.com.idyria.osi.tea.thread.ThreadLanguage
 
 /**
  * @author zm4632

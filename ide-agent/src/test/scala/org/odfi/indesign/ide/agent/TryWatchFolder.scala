@@ -1,7 +1,7 @@
 package org.odfi.indesign.ide.agent
 
 import java.io.File
-import com.idyria.osi.tea.files.FileWatcherAdvanced
+import imported.com.idyria.osi.tea.files.FileWatcherAdvanced
 
 object TryWatchFolder extends App {
   

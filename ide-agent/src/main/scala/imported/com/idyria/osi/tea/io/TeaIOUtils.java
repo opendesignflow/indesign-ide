@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.idyria.osi.tea.io;
+package imported.com.idyria.osi.tea.io;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

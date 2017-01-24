@@ -2,9 +2,9 @@ package org.odfi.indesign.ide.agent.reload
 
 import java.lang.instrument.Instrumentation
 import java.io.File
-import com.idyria.osi.tea.files.FileWatcherAdvanced
+import imported.com.idyria.osi.tea.files.FileWatcherAdvanced
 import java.lang.instrument.ClassDefinition
-import com.idyria.osi.tea.io.TeaIOUtils
+import imported.com.idyria.osi.tea.io.TeaIOUtils 
 import java.io.FileInputStream
 
 class IndesignClassReloader(val instrumentation: Instrumentation) {

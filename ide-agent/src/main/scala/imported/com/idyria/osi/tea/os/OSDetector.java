@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.idyria.osi.tea.os;
+package imported.com.idyria.osi.tea.os;
 
 /**
  * @author rtek
