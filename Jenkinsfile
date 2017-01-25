@@ -1,4 +1,4 @@
-// Indesign
+// Indesign IDE
 node {
  
   properties([pipelineTriggers([[$class: 'GitHubPushTrigger']])])
