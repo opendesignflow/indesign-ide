@@ -2,7 +2,7 @@ package org.odfi.indesign.ide.core.ui.main
 
 class WelcomeIDEView extends IDEBaseView {
    
-  this.definePart("page-body") {
+  this.placePage {
     
     div {
       

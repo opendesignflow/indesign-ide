@@ -19,6 +19,7 @@ import org.odfi.indesign.ide.module.maven.resolver._
 import com.idyria.osi.tea.compile.ClassDomain
 import com.idyria.osi.tea.logging.TLog
 import org.odfi.indesign.ide.core.sources.ModuleSourceFile
+import org.odfi.indesign.ide.module.maven.project
 
 class MavenExternalBrainRegionBuilder extends ExternalBrainRegionBuilder {
 
@@ -30,8 +31,17 @@ class MavenExternalBrainRegionBuilder extends ExternalBrainRegionBuilder {
         // Look for target/classes
         new File(new File(url.getPath), "pom.xml") match {
           case pomFile if (pomFile.exists()) =>
-            // Return 2 to be above standard Folder Region Builder
-            2
+            
+            //-- Filter out building the maven region project itself
+            var prj = project(pomFile.toURI().toURL())
+            prj.getArtifactId match {
+              case id if(id!=null && id == "indesign-ide-maven") =>
+                0
+              case other => 
+                 // Return 2 to be above standard Folder Region Builder score
+                2
+            }
+
           case _ => 0
         }
       case _ => 0
@@ -57,12 +67,12 @@ class MavenExternalBrainRegion(val basePath: HarvestedFile) extends MavenProject
   //-- Register Maven Region Builder
   //-- When Region is created, look if builder classdomain is tainted
   this.on("region.created") {
-      println("(***) MERegion create: "+regionBuilder.get.getClass.getClassLoader)
+    println("(***) MERegion create: " + regionBuilder.get.getClass.getClassLoader)
   }
 
   //ExternalBrainRegion.addBuilder(new MavenExternalBrainRegionBuilder,true)
 
-  override def name = projectModel.artifactId match {
+  override def getName = projectModel.artifactId match {
     case null => getId
     case v => v.toString
   }
@@ -70,6 +80,12 @@ class MavenExternalBrainRegion(val basePath: HarvestedFile) extends MavenProject
     case null => basePath.path.toFile().getAbsolutePath
     case v => v.toString
   }
+
+  override def isConfigLoaded = {
+    super.isConfigLoaded
+  }
+
+  override def config = super.config
 
   override def getRegionPath = basePath.path.toFile.getAbsolutePath
 
@@ -89,7 +105,7 @@ class MavenExternalBrainRegion(val basePath: HarvestedFile) extends MavenProject
   //TLog.setLevel(classOf[MavenProjectIndesignWorkspaceReader], TLog.Level.FULL)
   MavenProjectIndesignWorkspaceReader.resetAllProjects
   AetherResolver.session.setWorkspaceReader(MavenProjectIndesignWorkspaceReader)
- TLog.setLevel(classOf[MavenExternalBrainRegion], TLog.Level.FULL)
+  TLog.setLevel(classOf[MavenExternalBrainRegion], TLog.Level.FULL)
   //-- Load actual Region
   /*println(s"CL: " + Thread.currentThread().getContextClassLoader)
   this.resetClassDomain
@@ -101,13 +117,13 @@ class MavenExternalBrainRegion(val basePath: HarvestedFile) extends MavenProject
    */
   this.onSetup {
 
-     println("(***) MERegion Setup: "+regionBuilder.get.getClass.getClassLoader)
-    
-     regionBuilder.get.getClass.getClassLoader
-     this.changeParentClassDomain( regionBuilder.get.getClass.getClassLoader.asInstanceOf[ClassDomain])
-     
+    println("(***) MERegion Setup: " + regionBuilder.get.getClass.getClassLoader)
+
+    regionBuilder.get.getClass.getClassLoader
+    this.changeParentClassDomain(regionBuilder.get.getClass.getClassLoader.asInstanceOf[ClassDomain])
+
     //-- Update Dependencies
-    this.forceUpdateDependencies
+    // this.forceUpdateDependencies
 
     //-- Look for another MavenRegion which we would have in depedendencies
     this.resolveRegionClassDomainHierarchy
@@ -134,17 +150,22 @@ class MavenExternalBrainRegion(val basePath: HarvestedFile) extends MavenProject
   def loadRegionClass(cl: String) = {
 
     logFine[MavenExternalBrainRegion]("Maven load region Class: " + this.classdomain.get.getURLs.length)
-    try {
+    /*try {
       forceUpdateDependencies
     } catch {
       case e: Throwable =>
-    }
+    }*/
     logFine[MavenExternalBrainRegion]("--- After deps update: " + this.classdomain.get.getURLs.length)
     logFine[MavenExternalBrainRegion]("Create Region Class: " + this.classdomain.get)
     logFine[MavenExternalBrainRegion]("Create Region Class: " + this.classdomain.get.getURLs.toList)
     /*var region = Brain.createRegion(this.classDomain, cl)
     this.addSubRegion(region)*/
-    Brain.createRegion(this.classdomain.get, cl)
+    this.classdomain match {
+      case Some(cd) =>
+        ESome(Brain.createRegion(this.classdomain.get, cl))
+      case None =>
+        ENone
+    }
 
   }
 
@@ -166,11 +187,11 @@ class MavenExternalBrainRegion(val basePath: HarvestedFile) extends MavenProject
 
       logFine[MavenExternalBrainRegion]("Added Region for deps update: " + this + " - " + this.classdomain.get)
       MavenProjectIndesignWorkspaceReader.resetAllProjects
-      try {
+    /* try {
         forceUpdateDependencies
       } catch {
         case e: Throwable =>
-      }
+      }*/
   }
 
   /* this.onGathered {
@@ -190,12 +211,11 @@ class MavenExternalBrainRegion(val basePath: HarvestedFile) extends MavenProject
       this.taintClassDomain
       this.moveToShutdown
   }
-  
+
   override def rebuildDependencies = {
     this.updateDependencies
   }
-  
-  
+
   // Region Discovery
   //-----------
   override def discoverRegions: List[String] = {

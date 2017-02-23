@@ -1,0 +1,47 @@
+<html>
+<head>
+
+<link rel="stylesheet" href="alohaeditor-1.4.9/aloha/css/aloha.css" type="text/css">
+    <script src="alohaeditor-1.4.9/aloha/lib/require.js"></script>
+    <script src="alohaeditor-1.4.9/aloha/lib/aloha.js"
+      data-aloha-plugins="common/ui,common/format,common/highlighteditables,common/link"></script>
+      
+      <style type="text/css">
+        .module {
+            font-weight: bold;
+        }
+      </style>
+</head>
+
+<body>
+
+	<h1>Test</h1>
+
+
+<div>
+
+        <div  contenteditable="true">
+<code contenteditable="true">test2</code>
+
+<span class="module">module</span> test(); 
+
+    </div>
+
+
+	<div id="content">
+test
+
+	</div>
+	<script type="text/javascript">
+        Aloha.ready( function() {
+            Aloha.jQuery('#content').aloha();
+        });
+    </script>
+
+</div>
+
+</body>
+
+
+
+</html>

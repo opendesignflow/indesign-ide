@@ -5,10 +5,11 @@ import org.odfi.indesign.core.harvest.fs.HarvestedFile
 import java.io.File
 import org.odfi.indesign.core.module.lucene.LuceneIndexProvider
 import org.odfi.indesign.core.harvest.Harvest
+import org.odfi.indesign.ide.core.project.ProjectHarvesterTrait
 
-object MavenProjectHarvester extends FileSystemHarvester with LuceneIndexProvider {
+object MavenProjectHarvester extends FileSystemHarvester with LuceneIndexProvider with ProjectHarvesterTrait {
  
-  this.addChildHarvester(new POMFileHarvester)
+  //this.addChildHarvester(new POMFileHarvester)
 
   override def doHarvest = {
    
@@ -29,7 +30,7 @@ object MavenProjectHarvester extends FileSystemHarvester with LuceneIndexProvide
     case r if (r.path.toFile().getName == "pom.xml") =>
     
 
-      logFine(s"Delivered Maven Project ")
+      println(s"Delivered Maven Project ")
       var mp = new MavenProjectResource(r.path.toFile.getParentFile.getCanonicalFile.toPath)
       gather(mp.deriveFrom(r))
       mp.onGathered {
@@ -41,7 +42,7 @@ object MavenProjectHarvester extends FileSystemHarvester with LuceneIndexProvide
 
       var pomFile = new File(r.path.toFile(), "pom.xml")
 
-      logFine(s"Delivered Maven Project ")
+      println(s"Delivered Maven Project : "+r.path.toFile())
       var mp = new MavenProjectResource(r.path)
       gather(mp.deriveFrom(r))
       mp.onGathered {
@@ -50,7 +51,10 @@ object MavenProjectHarvester extends FileSystemHarvester with LuceneIndexProvide
       }
 
       true
-    case _ => false
+    case other => 
+      
+      println("Maven ignored file: "+other)
+      false
 
   }
 

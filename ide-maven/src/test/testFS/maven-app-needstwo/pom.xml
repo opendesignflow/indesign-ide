@@ -4,7 +4,8 @@
 	<groupId>org.odfi.indesign.ide.module.maven.test</groupId>
 	<artifactId>maven-app-needstwo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>InDesign Core</name>
+	<name>App with two Internal Dependencies</name>
+
 
 	<parent>
 		<groupId>com.idyria.osi</groupId>

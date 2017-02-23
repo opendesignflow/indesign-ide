@@ -51,6 +51,7 @@
 						</goals>
 						<configuration>
 							<sources>
+								<source>src/examples/scala</source>
 								<source>${project.build.directory}/generated-sources/scala</source>
 							</sources>
 						</configuration>
@@ -62,6 +63,7 @@
 						</goals>
 						<configuration>
 							<sources>
+								<source>src/examples/scala</source>
 								<source>${project.build.directory}/generated-sources/scala</source>
 							</sources>
 						</configuration>
@@ -81,24 +83,24 @@
 					</execution>
 				</executions>
 			</plugin>
-<!-- 			<plugin> -->
-<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
-<!-- 				<artifactId>maven-dependency-plugin</artifactId> -->
-<!-- 				<version>2.10</version> -->
-<!-- 				<executions> -->
-<!-- 					<execution> -->
-<!-- 						<id>copy</id> -->
-<!-- 						<phase>compile</phase> -->
-<!-- 						<goals> -->
-<!-- 							<goal>copy-dependencies</goal> -->
-<!-- 						</goals> -->
-<!-- 						<configuration> -->
-<!-- 							<excludeScope>provided</excludeScope> -->
-<!-- 							other configurations here -->
-<!-- 						</configuration> -->
-<!-- 					</execution> -->
-<!-- 				</executions> -->
-<!-- 			</plugin> -->
+			<!-- <plugin> -->
+			<!-- <groupId>org.apache.maven.plugins</groupId> -->
+			<!-- <artifactId>maven-dependency-plugin</artifactId> -->
+			<!-- <version>2.10</version> -->
+			<!-- <executions> -->
+			<!-- <execution> -->
+			<!-- <id>copy</id> -->
+			<!-- <phase>compile</phase> -->
+			<!-- <goals> -->
+			<!-- <goal>copy-dependencies</goal> -->
+			<!-- </goals> -->
+			<!-- <configuration> -->
+			<!-- <excludeScope>provided</excludeScope> -->
+			<!-- other configurations here -->
+			<!-- </configuration> -->
+			<!-- </execution> -->
+			<!-- </executions> -->
+			<!-- </plugin> -->
 		</plugins>
 	</build>
 
@@ -109,10 +111,10 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-		  <groupId>${project.groupId}</groupId>
-		  <artifactId>indesign-ide-core</artifactId>
-		  <version>${project.version}</version>
-		  <scope>provided</scope>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>indesign-ide-core</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>

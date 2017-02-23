@@ -43,7 +43,8 @@ class MavenRegionRuntimeClassdomainTest extends FunSuite with GivenWhenThen {
 
     // Check Dependencies
     //-------------------------
-    regionA.forceUpdateDependencies
+    //regionA.forceUpdateDependencies
+    
     //regionB.forceUpdateDependencies
     var depsA = regionA.getDependencies
     var depsB = regionB.getDependencies

@@ -4,7 +4,7 @@
 	<groupId>org.odfi.indesign.core.test</groupId>
 	<artifactId>maven-app-noscala</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>InDesign Core</name>
+	<name>Project with no scala</name>
 
 	<dependencies>
 		<dependency>

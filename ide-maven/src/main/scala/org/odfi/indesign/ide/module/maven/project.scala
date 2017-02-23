@@ -5,6 +5,7 @@ import org.eclipse.aether.artifact.Artifact
 import java.io.File
 import com.idyria.osi.ooxoo.core.buffers.structural.io.sax.StAXIOBuffer
 import java.io.FileInputStream
+import org.eclipse.aether.artifact.DefaultArtifact
 
 @xelement(name = "project")
 class project extends projectTrait {
@@ -35,6 +36,18 @@ class project extends projectTrait {
       case v =>
         v.toString
     }
+  }
+  
+  // Dependencies
+  //--------------
+  def getArtifacts = dependencies match {
+    case null => List()
+    case dependencies => 
+      dependencies.dependencies.map {
+        dep => 
+          new DefaultArtifact(dep.artifactId,dep.groupId,"jar",version)
+      }.toList
+      
   }
 
   // Utilities
