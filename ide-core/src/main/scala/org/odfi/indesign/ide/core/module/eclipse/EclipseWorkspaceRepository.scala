@@ -9,12 +9,13 @@ import java.io.FileInputStream
 import java.net.URL
 import com.idyria.osi.tea.io.TeaIOUtils
 import org.eclipse.aether.artifact.Artifact
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters
+import scala.collection.convert.DecorateAsJava
 
 /**
  * Just an Aether Worskspace Repository and reader
  */
-class EclipseWorkspaceReader(val workspaceLocation: File, val workspaceRepository: WorkspaceRepository = new WorkspaceRepository("eclipse")) extends WorkspaceReader with TLogSource {
+class EclipseWorkspaceReader(val workspaceLocation: File, val workspaceRepository: WorkspaceRepository = new WorkspaceRepository("eclipse")) extends WorkspaceReader with TLogSource with DecorateAsJava {
 
     var projectsLocation = new File(workspaceLocation, ".metadata/.plugins/org.eclipse.core.resources/.projects")
 
@@ -95,7 +96,7 @@ class EclipseWorkspaceReader(val workspaceLocation: File, val workspaceRepositor
             case (file, art) => art.version.toString()
         }.toList*/
 
-        List[String]()
+        List[String]().asJava
     }
 
     def getRepository(): WorkspaceRepository = workspaceRepository
