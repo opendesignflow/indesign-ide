@@ -16,11 +16,23 @@ import org.odfi.indesign.ide.core.ui.IndesignFrameworkView
 import org.odfi.indesign.core.harvest.Harvest
 import org.odfi.indesign.core.config.Config
 import org.odfi.indesign.ide.core.ui.IDEGUI
+import org.odfi.wsb.fwapp.framework.FWAppTempBufferView
+import org.odfi.wsb.fwapp.framework.FWAppValueBufferView
+import org.odfi.wsb.fwapp.Site
+import org.odfi.indesign.core.brain.Brain
+import org.odfi.indesign.ide.core.ui.contrib.IDEGUIMenuProvider
+import org.odfi.wsb.fwapp.assets.ResourcesAssetSource
+import org.odfi.indesign.core.main.IndesignPlatorm
 
-class IDEBaseView extends SemanticUIImplView with SemanticView with FWAppValueBindingView with DataTablesView with JQueryTreetable with IndesignFrameworkView {
+class IDEBaseView extends SemanticUIImplView with SemanticView with FWAppTempBufferView with FWAppValueBufferView with DataTablesView with JQueryTreetable with IndesignFrameworkView {
 
   // Common 
+  override def getDisplayName = getClass.getName.replace("$", "")
 
+  
+  
+  
+  
   // Request Utils
   //-----------------
   def isLocalRequestWithDisplay = {
@@ -42,6 +54,14 @@ class IDEBaseView extends SemanticUIImplView with SemanticView with FWAppValueBi
   this.viewContent {
     html {
       head {
+        
+        // IDE Libraries
+        this.getAssetsResolver match {
+          case Some(resolver) if(resolver.findAssetsSource("/indesign-ide").isEmpty) =>
+            resolver.addAssetsSource("/indesign-ide", new ResourcesAssetSource).addFilesSource("indesign-ide")
+          case other => 
+        }
+        
         placeLibraries
 
       }
@@ -59,9 +79,9 @@ class IDEBaseView extends SemanticUIImplView with SemanticView with FWAppValueBi
           "ui horizontal menu" :: div {
             "header item" :: "Menu"
             "item" :: a("#") {
-              
+
               image(createAssetsResolverURI("/indesign-ide/images/tractor-icon-32.png")) {
-              waitReloadPage
+                waitReloadPage
                 onClickReload {
                   Harvest.run
                 }
@@ -69,8 +89,8 @@ class IDEBaseView extends SemanticUIImplView with SemanticView with FWAppValueBi
             }
             "item" :: a("#")(text("Dashboard"))
 
-            "item" :: a("/site/sources")(text("Sources"))
-            "item" :: a("/site/projects")(text("Projects"))
+            "item" :: a("@/site/sources")(text("Sources"))
+            "item" :: a("@/site/projects")(text("Projects"))
 
             // Plugins
             //-----------------
@@ -80,24 +100,81 @@ class IDEBaseView extends SemanticUIImplView with SemanticView with FWAppValueBi
 
               "dropdown icon" :: i()
 
-              IDEGUI.findIntermediaryForPath("/site/plugins") match {
+              IDEGUI.findIntermediaryForPath("/site/plugins/imported") match {
                 case Some(pluginsBase) =>
                   "menu" :: div {
 
-                    "item" :: a("/site/plugins")(text("Overview"))
+                    //-- overview Link
+                    "item" :: a("@/site/plugins")(text("Overview"))
 
+                    // Site Modules
+                    /* Brain.getResources.foreach {
+                      case site : Site if(site!=IDEGUI) => 
+                      
+                         "item" :: a(site.fullURLPath)(text(site.getDisplayName))
+                         
+                      case other =>
+                        other.getDerivedResources[Site].foreach {
+                          site => 
+                            "item" :: a(site.fullURLPath)(text(site.getDisplayName))
+                        }
+                         
+                    }*/
+
+                    //-- Plugins
+                    /* pluginsBase.intermediaries.foreach {
+                      i => 
+                        println("** PB: "+i)
+                    }*/
                     pluginsBase.intermediaries.collect { case i: FWappIntermediary => i }.foreach {
-                      pathIntermediary =>
-                        println(s"Found IIIII")
 
-                        var secondLevel = pathIntermediary.intermediaries.collect { case i: FWappIntermediary => i }
+                      //-- Site
+                      case site: Site =>
+
+                        
+                        
+                        //-- Get Extra Menu
+                        site match {
+                          case menuProvider : IDEGUIMenuProvider if(menuProvider.getMenuLinks.size>0) => 
+                            
+                            "ui dropdown item" :: div {
+                              text(site.getDisplayName)
+                              
+                              "dropdown icon" :: i()
+
+                              "menu" :: div {
+
+                                "item" :: a(site.fullURLPath)(text(site.getDisplayName))
+                                
+                                menuProvider.getMenuLinks.foreach {
+                                  case (name,link) =>
+
+                                    "item" :: a(link)(text(name))
+
+                                }
+
+                              }
+
+                            }
+                            
+                          case other => 
+                            
+                            "item" :: a("@/"+site.fullURLPath)(text(site.getDisplayName))
+                        }
+                        
+                      //-- Standard In
+                      case pathIntermediary =>
+
+                      //println(s"Found IIIII")
+
+                      /*var secondLevel = pathIntermediary.intermediaries.collect { case i: FWappIntermediary => i }
                         secondLevel.size match {
                           case 0 =>
                             // Menu Item
                             "item" :: a("")(text(pathIntermediary.basePath.replace("/", "")))
                           case other =>
                             "ui dropdown item" :: div {
-                              a("")(text(pathIntermediary.basePath.replace("/", "")))
+                              a("")(text(pathIntermediary.getDisplayName))
                               "dropdown icon" :: i()
 
                               "menu" :: div {
@@ -105,7 +182,7 @@ class IDEBaseView extends SemanticUIImplView with SemanticView with FWAppValueBi
                                 secondLevel.foreach {
                                   secondLevelIntermediary =>
 
-                                    "item" :: a(secondLevelIntermediary.fullURLPath)(text(secondLevelIntermediary.basePath.replace("/", "")))
+                                    "item" :: a(secondLevelIntermediary.fullURLPath)(text(secondLevelIntermediary.getDisplayName))
 
                                 }
 
@@ -113,7 +190,7 @@ class IDEBaseView extends SemanticUIImplView with SemanticView with FWAppValueBi
 
                             }
 
-                        }
+                        }*/
 
                     }
                   }
@@ -159,7 +236,7 @@ class IDEBaseView extends SemanticUIImplView with SemanticView with FWAppValueBi
                   form {
                     label("New Realm:") {
                       input {
-                        bindValueAuto {
+                        bindValue {
                           realm: String =>
                             println("Bound realm value: " + realm)
                         }
@@ -186,6 +263,21 @@ class IDEBaseView extends SemanticUIImplView with SemanticView with FWAppValueBi
 
               }
 
+            }
+            // EOF workspace selection
+            
+            //-- Shutdown icon
+            "ui item button icon" ::div {
+              
+              +@("data-tooltip" -> "Add users to your feed")
+              
+              "power icon" ::  i {
+                
+                onClick {
+                  IndesignPlatorm.stop
+                }
+              }
+              
             }
           }
 

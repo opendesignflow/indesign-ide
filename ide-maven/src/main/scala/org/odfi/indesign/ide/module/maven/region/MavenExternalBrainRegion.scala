@@ -20,6 +20,7 @@ import com.idyria.osi.tea.compile.ClassDomain
 import com.idyria.osi.tea.logging.TLog
 import org.odfi.indesign.ide.core.sources.ModuleSourceFile
 import org.odfi.indesign.ide.module.maven.project
+import scala.reflect.ClassTag
 
 class MavenExternalBrainRegionBuilder extends ExternalBrainRegionBuilder {
 
@@ -60,7 +61,7 @@ class MavenExternalBrainRegionBuilder extends ExternalBrainRegionBuilder {
 /**
  * Loads a Brain Region present in another externaly compiled module
  */
-class MavenExternalBrainRegion(val basePath: HarvestedFile) extends MavenProjectResource(basePath.path) with ExternalBrainRegion with ArtifactRegion {
+class MavenExternalBrainRegion(val basePath: HarvestedFile) extends MavenProjectResource(basePath) with ExternalBrainRegion with ArtifactRegion {
 
   //  TLog.setLevel(classOf[MavenExternalBrainRegion], TLog.Level.FULL)
 
@@ -90,7 +91,7 @@ class MavenExternalBrainRegion(val basePath: HarvestedFile) extends MavenProject
   override def getRegionPath = basePath.path.toFile.getAbsolutePath
 
   def getRegionArtifact: Artifact = new DefaultArtifact(projectModel.getGroupId, projectModel.getArtifactId, "jar", projectModel.getVersion)
-  def getRegionDependencies: List[Artifact] = this.getDependencies
+  def getRegionDependencies = this.getDependencies.map { d => d.getArtifact}
 
   //-- Override tainted to make sure tainted is only if original classloader is tainted and also local one
 
@@ -103,9 +104,10 @@ class MavenExternalBrainRegion(val basePath: HarvestedFile) extends MavenProject
 
   //-- Detect dependent projects
   //TLog.setLevel(classOf[MavenProjectIndesignWorkspaceReader], TLog.Level.FULL)
-  MavenProjectIndesignWorkspaceReader.resetAllProjects
-  AetherResolver.session.setWorkspaceReader(MavenProjectIndesignWorkspaceReader)
-  TLog.setLevel(classOf[MavenExternalBrainRegion], TLog.Level.FULL)
+  //MavenProjectIndesignWorkspaceReader.resetAllProjects
+  //AetherResolver.session.setWorkspaceReader(MavenProjectIndesignWorkspaceReader)
+  //TLog.setLevel(classOf[MavenExternalBrainRegion], TLog.Level.FULL)
+  
   //-- Load actual Region
   /*println(s"CL: " + Thread.currentThread().getContextClassLoader)
   this.resetClassDomain
@@ -186,7 +188,7 @@ class MavenExternalBrainRegion(val basePath: HarvestedFile) extends MavenProject
     case h =>
 
       logFine[MavenExternalBrainRegion]("Added Region for deps update: " + this + " - " + this.classdomain.get)
-      MavenProjectIndesignWorkspaceReader.resetAllProjects
+      //MavenProjectIndesignWorkspaceReader.resetAllProjects
     /* try {
         forceUpdateDependencies
       } catch {
@@ -232,5 +234,7 @@ class MavenExternalBrainRegion(val basePath: HarvestedFile) extends MavenProject
     }*/
 
   }
+  
+  override def discoverType[CT <: Any](implicit tag :ClassTag[CT]) =  super.discoverType
 
 }

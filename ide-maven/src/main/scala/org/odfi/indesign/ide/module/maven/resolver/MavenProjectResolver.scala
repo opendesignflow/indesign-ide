@@ -15,68 +15,63 @@ import org.odfi.indesign.core.brain.Brain
 import org.odfi.indesign.core.brain.external.FolderOutputBrainRegion
 import org.odfi.indesign.core.brain.BrainRegion
 import org.odfi.indesign.ide.module.maven.region.MavenExternalBrainRegion
+import org.apache.maven.project.MavenProject
 
-trait MavenProjectIndesignWorkspaceReader {
+trait MavenProjectWorkspaceReader {
 
 }
-object MavenProjectIndesignWorkspaceReader extends WorkspaceReader with TLogSource {
+object MavenProjectWorkspaceReader extends WorkspaceReader with TLogSource with MavenProjectWorkspaceReader {
+
+  //tlogEnableFull[MavenProjectWorkspaceReader]
 
   val workspaceRepository: WorkspaceRepository = new WorkspaceRepository("indesign-maven")
 
-  var allProjects: Option[List[(File, project)]] = None
+  var allProjects: Option[List[MavenProjectResource]] = None
 
-  def resetAllProjects = {
+  def resetAllProjects = this.synchronized {
+    var t = new Throwable
+    t.fillInStackTrace()
+    var cause = t.getStackTrace()(2)
+    //println("Reset from: " + cause.getFileName + ":" + cause.getLineNumber)
     this.allProjects = None
   }
 
-  def getAllProjects: List[(File, project)] = allProjects match {
-    case Some(ap) => ap
-    case None =>
-      // Find Maven
-      //----------------------
-      var foundMaven = MavenProjectHarvester.getResourcesOfType[MavenProjectResource]
+  def getAllProjects: List[MavenProjectResource] = this.synchronized {
+    allProjects match {
 
-      var foundMavenRes = foundMaven.map { mp => (mp.pomFile, mp.projectModel) }
+      case Some(ap) => ap
+      case None =>
 
-      // Find MavenRegions
-      //----------------------
-      var foundMavenRegions = Harvest.collectResourcesOnHarvesters[Brain, MavenExternalBrainRegion, MavenExternalBrainRegion] {
-        case mp =>
-          // println("Match")
-          mp
+        // Find Maven
+        //----------------------
+        var foundMaven = MavenProjectHarvester.getResourcesOfType[MavenProjectResource]
 
-      }
-      var foundMavenRegionsRes = foundMavenRegions.map { mp => (mp.pomFile, mp.projectModel) }
+        /*var foundMavenRes = foundMaven.collect {
+          case mp if (mp.getMavenModel.isDefined) => mp
 
-      // Find Folder
-      //---------------------
-      /*logFine[MavenProjectIndesignWorkspaceReader]("Fodler Regions: "+Brain.getResourcesOfType[BrainRegion])
-    Brain.onResources[FolderOutputBrainRegion] {
-      case r => 
-        logFine[MavenProjectIndesignWorkspaceReader]("Testing: "+r)
-    }*/
-      /*Harvest.collectResourcesOnHarvesters[Brain, FolderOutputBrainRegion, FolderOutputBrainRegion] {
-      case r  =>
-        logFine[MavenProjectIndesignWorkspaceReader]("Testing: "+r)
-        r
-    }*/
-      var foundfolder = Harvest.collectResourcesOnHarvesters[Brain, FolderOutputBrainRegion, FolderOutputBrainRegion] {
-        case r if (new File(r.basePath, "pom.xml").exists) =>
-          // println("Match")
-          r
+        }*/
+        // Find MavenRegions
+        //----------------------
+        var foundMavenRegions = Harvest.collectResourcesOnHarvesters[Brain, MavenExternalBrainRegion, MavenExternalBrainRegion] {
+          case mp =>
+            // println("Match")
+            mp
 
-      }
-      var foundfolderRes = foundfolder.map {
-        r =>
-          logFine[MavenProjectIndesignWorkspaceReader]("Found: " + r)
-          (new File(r.basePath, "pom.xml"), project(new File(r.basePath, "pom.xml").toURI().toURL()))
-      }
+        }
+       /* var foundMavenRegionsRes = foundMavenRegions.collect {
+          case mp if (mp.getMavenModel.isDefined) => mp
 
-      var res = foundMavenRes ::: foundfolderRes ::: foundMavenRegionsRes
+        }*/
 
-      logFine[MavenProjectIndesignWorkspaceReader]("found all: " + res)
-      this.allProjects = Some(res)
-      res
+        //var res = foundMavenRes ::: foundMavenRegionsRes
+        var res = foundMaven ::: foundMavenRegions
+        this.allProjects = Some(res)
+
+        //logWarn[MavenProjectWorkspaceReader]("found all: " + allProjects)
+        println("found all: " + allProjects)
+        res
+
+    }
 
   }
 
@@ -85,62 +80,34 @@ object MavenProjectIndesignWorkspaceReader extends WorkspaceReader with TLogSour
    */
   def findArtifact(artifact: Artifact): File = {
 
-    //logFine[MavenProjectIndesignWorkspaceReader]("Looking in Other Maven Projects: " + artifact)
+    logFine[MavenProjectWorkspaceReader]("Looking in Other Maven Projects: " + artifact + "-> " + artifact.getFile)
 
-    var found = getAllProjects.collect {
-      case (file, mp) if (mp != null && mp.is(artifact)) =>
-        file
-
-    }
-
-    /*var found = Harvest.collectResourcesOnHarvesters[MavenProjectHarvester, MavenProjectResource, MavenProjectResource] {
-      case mp if (mp.projectModel != null && mp.projectModel.is(artifact)) =>
-        // println("Match")
-        mp
-
-    }*/
-    //println("Found: " + found)
-    var res = found.size match {
-      case 0 =>
+    val allp = getAllProjects
+    allp.find {
+      mp =>
+        mp.isArtifact(artifact)
+    } match {
+      case Some(mavenResource) if (artifact.getExtension == "pom" && mavenResource.getMavenModel.isDefined) =>
+        logFine[MavenProjectWorkspaceReader]("Found: " + mavenResource.getMavenModel.get.getFile)
+        mavenResource.getMavenModel.get.getFile
+      case Some(mavenResource) if (artifact.getExtension == "jar" && mavenResource.getMavenModel.isDefined) =>
+        var res = new File(mavenResource.getMavenModel.get.getBuild.getOutputDirectory)
+        logFine[MavenProjectWorkspaceReader]("Found: " + res)
+        res
+      case other =>
         null
-      case _ =>
-
-        //new File(found.head.path.toFile().getCanonicalFile, "target/classes")
-        found.head
     }
-
-    // println("Looking in Other Maven Projects: " + artifact+ "-> "+res)
-
-    res
+    
+     //null
 
   }
 
   def findVersions(artifact: Artifact): java.util.List[String] = {
 
-    var found = getAllProjects.collect {
-      case (file, mp) if (mp != null && mp.is(artifact)) => mp
-    }
-
-    /*var found = Harvest.collectResourcesOnHarvesters[MavenProjectHarvester, MavenProjectResource, MavenProjectResource] {
-      case mp if (mp.projectModel != null && mp.projectModel.is(artifact)) =>
-        // println("Match")
-        mp
-
-    }*/
-
-    found.map {
-      mp => mp.version.toString()
+    getAllProjects.collect {
+      case mp if (mp.isArtifact(artifact)) => mp.getVersion
     }.toList
 
-    /*this.projectArtifacts.filter {
-            case (file, art) => artifact.getGroupId == art.groupId.toString() &&
-                artifact.getArtifactId == art.artifactId.toString()
-
-        }.map {
-            case (file, art) => art.version.toString()
-        }.toList*/
-
-    //List[String]()
   }
 
   def getRepository(): WorkspaceRepository = workspaceRepository

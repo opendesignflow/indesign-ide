@@ -14,6 +14,7 @@ import org.odfi.indesign.core.harvest.Harvest
 import org.odfi.indesign.core.brain.Brain
 import com.idyria.osi.tea.files.FileWatcherAdvanced
 import org.odfi.indesign.core.harvest.fs.FSGlobalWatch
+import org.odfi.indesign.core.harvest.fs.HarvestedFile
 
 class MavenLiveCompilerTest extends FunSuite {
 
@@ -32,7 +33,7 @@ class MavenLiveCompilerTest extends FunSuite {
     
     
     // Get Project
-    var topProject = new MavenProjectResource(new File("src/test/testFS/maven-app-ooxoo/").toPath())
+    var topProject = new MavenProjectResource(new HarvestedFile(new File("src/test/testFS/maven-app-ooxoo/").toPath()))
     MavenProjectHarvester.gatherPermanent(topProject)
     
     Harvest.run

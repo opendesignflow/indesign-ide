@@ -10,14 +10,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Calendar;
 import java.util.Scanner;
 
 
@@ -41,6 +36,7 @@ public class TeaIOUtils {
 	
 	public static String waitForNewLineConsoleInput() {
 		// get scanner
+		@SuppressWarnings("resource")
 		Scanner scan = new Scanner(System.in);
 		return scan.nextLine();
 		
@@ -48,6 +44,7 @@ public class TeaIOUtils {
 	
 	public static String waitForNewCharacterConsoleInput() {
 		// get scanner
+		@SuppressWarnings("resource")
 		Scanner scan = new Scanner(System.in);
 		return scan.next();
 		
@@ -101,13 +98,12 @@ public class TeaIOUtils {
 			int buffsize = BUFF_SIZE;
 			byte[] buff = new byte[buffsize];
 			int sizeRead = 0;
-			int position = 0;
+			
 			// Swallow
 			while ( (sizeRead = is.read(buff))!=-1  ) {
 				
 				// Copy
 				os.write(buff,0,sizeRead);
-				position+=sizeRead;
 				
 			}
 			is.close();

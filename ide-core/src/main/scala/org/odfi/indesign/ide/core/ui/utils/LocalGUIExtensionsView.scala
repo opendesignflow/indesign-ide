@@ -15,10 +15,16 @@ trait LocalGUIExtensionsView extends IndesignFrameworkView {
     "ui button" :: button(text) {
       onClick {
         JFXRun.onJavaFX {
+          
           var stage = new Stage()
           var dirChooser = new DirectoryChooser();
           dirChooser.setTitle("Select Compilation Output Folder for a region");
-
+          
+         
+          stage.setAlwaysOnTop(true)
+          //stage.show()
+          //stage.setFocused(true)
+          
           dirChooser.showDialog(stage) match {
             case null =>
             case folder =>

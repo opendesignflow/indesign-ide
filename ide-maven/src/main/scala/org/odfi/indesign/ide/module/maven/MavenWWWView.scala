@@ -56,16 +56,16 @@ class MavenWWWView (val mavenProject: MavenProjectResource) extends IDEBaseView 
             mavenProject.getDependencies.foreach {
               dep => 
                 tr {
-                  td(dep.getArtifactId) {
+                  td(dep.getArtifact.getArtifactId) {
                     
                   }
-                  td(dep.getGroupId) {
+                  td(dep.getArtifact.getGroupId) {
                     
                   }
-                  td(dep.getVersion) {
+                  td(dep.getArtifact.getVersion) {
                     
                   }
-                  td(dep.getFile.toString()) {
+                  td(dep.getArtifact.getFile.toString()) {
                     
                   }
                 }

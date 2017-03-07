@@ -4,8 +4,9 @@ import org.odfi.wsb.fwapp.views.LibraryView
 import com.idyria.osi.tea.errors.ErrorSupport
 import com.idyria.osi.vui.html.Td
 import com.idyria.osi.tea.errors.TError
+import org.odfi.wsb.fwapp.module.datatables.DataTablesView
 
-trait ErrorsHelpView extends LibraryView {
+trait ErrorsHelpView extends LibraryView with DataTablesView {
 
   this.addLibrary("indesign-ide") {
     case (_, node) =>
@@ -41,13 +42,14 @@ trait ErrorsHelpView extends LibraryView {
             "icon remove circle" :: i {
 
             }
-            "popup-activate" :: a("#") {
+            "popup-activate" :: a("#" + "open-errors-" + err.hashCode()) {
+              id("open-errors-" + err.hashCode())
               text(s"${err.errors.size} errors")
 
             }
             "ui flowing popup top left transition hidden" :: div {
               "ui compact table" :: table {
-                thead("File", "Line", "Message")
+                thead("File", "Line", "Type", "Message")
                 tbody {
                   err.errors.foreach {
                     case error: TError =>
@@ -64,6 +66,18 @@ trait ErrorsHelpView extends LibraryView {
                           error.line match {
                             case Some(f) => text(f.toString)
                             case None => text("-")
+                          }
+
+                        }
+                        td("") {
+
+                          "popup-activate" :: a("#" + "open-stack-" + error.hashCode()) {
+                            id("open-stack-" + error.hashCode())
+                            text(s"${error.getClass.getSimpleName}")
+
+                          }
+                          "ui flowing popup top left transition hidden" :: div {
+                            text("TRR")
                           }
 
                         }
@@ -90,8 +104,8 @@ trait ErrorsHelpView extends LibraryView {
       // Otherwise, errors
       //--------------
       case other =>
-        "popup-activate" :: a("#") {
-          text("Errors: " + err.errors.size)
+        "popup-activate" :: button("Errors: " + err.errors.size) {
+          //text()
         }
         errorPopupTable(err)
 
@@ -103,7 +117,7 @@ trait ErrorsHelpView extends LibraryView {
 
     "ui flowing popup top left transition hidden" :: div {
       "ui compact table" :: table {
-        thead("File", "Line", "Message")
+        thead("File", "Line", "Message", "Stack")
         tbody {
           err.errors.foreach {
             case error: TError =>
@@ -125,6 +139,17 @@ trait ErrorsHelpView extends LibraryView {
                 }
                 td(error.getLocalizedMessage) {
 
+                }
+
+                td("") {
+                  "popup-activate" :: button(s"${error.getClass.getSimpleName}") {
+                    //id("open-stack-" + error.hashCode())
+                   // text(s"${error.getClass.getSimpleName}")
+
+                  }
+                  "ui flowing popup top left transition hidden" :: div {
+                    text {error.getStackTraceString}
+                  }
                 }
 
               }

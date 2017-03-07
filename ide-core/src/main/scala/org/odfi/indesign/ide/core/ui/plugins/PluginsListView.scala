@@ -13,17 +13,19 @@ import javafx.stage.FileChooser
 import javafx.stage.DirectoryChooser
 import org.odfi.indesign.core.brain.BrainRegion
 import org.odfi.indesign.core.harvest.Harvester
+import org.odfi.indesign.core.brain.RegionClassName
+import org.odfi.indesign.ide.core.ui.utils.ErrorsHelpView
 
-class PluginsListView extends IDEBaseView {
+class PluginsListView extends IDEBaseView with ErrorsHelpView {
 
   this.placePage {
     div {
 
       ribbonHeaderDiv("blue", "Plugins List") {
 
-        // Table of Brain External Regions which are plugins
+        // Table of Brain External Regions which are plugins sortable
         //----------
-        "ui celled sortable table treetable" :: table {
+        "ui celled  table treetable" :: table {
           id("region-table")
           thead {
             tr {
@@ -306,23 +308,34 @@ class PluginsListView extends IDEBaseView {
                     }
                     td("") {
 
-                      region.discoverRegions foreach {
+                      region.getDerivedResources[RegionClassName] foreach {
                         regionClass =>
+                          
+                         // println("** GUI for external region available region: "+regionClass.className)
+                         // println("REgion configuration has values:")
+                         // region.configKey.get.values.foreach {
+                          //  v => 
+                          //    println("-> V: "+v)
+                          //}
+                          
                           div {
-                            "ui button" :: button(regionClass) {
-                              region.configKey.get.values.find { value => value.toString() == regionClass } match {
+                            "ui button" :: button(regionClass.className) {
+                              
+                              //region.configKey
+                              
+                              region.configKey.get.values.find { value => value.toString() == regionClass.className } match {
                                 case Some(found) => classes("green")
                                 case None => classes("red")
                               }
                               onClickReload {
-                                region.configKey.get.values.find { value => value.toString() == regionClass } match {
+                                region.configKey.get.values.find { value => value.toString() == regionClass.className } match {
                                   case Some(found) => 
                                     region.configKey.get.values -= found
                                     // FIXME: Region class
                                   case None => 
                                     
-                                    region.configKey.get.values.add.set(regionClass)
-                                    region.addRegionClass(regionClass)
+                                    region.configKey.get.values.add.set(regionClass.className)
+                                    region.loadRegionClass(regionClass.className)
                                 }
                                 Brain.config.get.resyncToFile
                                 Harvest.run
@@ -341,13 +354,6 @@ class PluginsListView extends IDEBaseView {
             }
             // EOF Table
 
-            div {
-              "ui button" :: button("Save") {
-                onClick {
-                  Brain.config.get.resyncToFile
-                }
-              }
-            }
         }
 
         // Add External Region
@@ -382,13 +388,7 @@ class PluginsListView extends IDEBaseView {
           case false =>
         }
         // End of select directory
-
-        // Test button
-        "ui button" :: button("Test") {
-          onClick {
-            println("Test");
-          }
-        }
+   
 
       }
 
@@ -449,7 +449,7 @@ class PluginsListView extends IDEBaseView {
       }
 
       //-- Harvest Table 
-      "ui celled sortable table treetable" :: table {
+      "ui celled table treetable" :: table {
         id("harvest-table")
         thead {
           tr {
@@ -487,14 +487,15 @@ class PluginsListView extends IDEBaseView {
 
                 importHTML(<i class="shipping icon"></i>)
                 importHTML(<i class="settings icon ui popup-activate"></i>)
-
+                span(textContent(hv.getDisplayName+"@"+hv.hashCode()))
+                
                 "ui flowing popup top left transition hidden" :: div {
                   h4("Config") {
 
                   }
                   //configTable(hv.config)
                 }
-                span(textContent(hv.getClass.getSimpleName))
+                
 
               }
 
@@ -512,16 +513,7 @@ class PluginsListView extends IDEBaseView {
                     }
                     "ui flowing popup top left transition hidden" :: div {
                       "ui celled table vui-datatables" :: table {
-                        thead {
-                          tr {
-                            th("Name") {
-
-                            }
-                            th("Error State") {
-
-                            }
-                          }
-                        }
+                        thead("Name","Error State") 
                         tbody {
                           hv.getResources.foreach {
                             ar =>
@@ -530,7 +522,10 @@ class PluginsListView extends IDEBaseView {
 
                                 }
                                 //-- Resource Error 
-                                ar.getLastError match {
+                                td("") {
+                                  errorsStat(ar)
+                                }
+                                /*ar.getLastError match {
                                   case Some(e) =>
                                     "negative" :: td("") {
                                       "icon close" :: i {
@@ -545,7 +540,7 @@ class PluginsListView extends IDEBaseView {
                                       }
                                       span(textContent("None"))
                                     }
-                                }
+                                }*/
 
                               }
                           }

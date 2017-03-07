@@ -18,3 +18,49 @@ abstract class BuildableProjectFolder(p:Path) extends ProjectFolder(p) with Buil
   }
   
 }
+
+class DefaultBuildableProjectFolder(p:Path) extends BuildableProjectFolder(p) {
+  
+   // Members declared in org.odfi.indesign.ide.core.project.Project
+  def getProjectId: String =  getId
+  
+  
+  // Members declared in org.odfi.indesign.ide.core.project.BuildableProject
+  def buildCompiler: Unit = {
+    
+  }
+  def buildDependencies: Unit = {
+    
+  }
+  def buildFully: Unit ={
+    
+  }
+  def buildInvalidateCompiler: Unit = {
+    
+  }
+  def buildInvalidateDependencies: Unit ={
+    
+  }
+  def buildInvalidateLiveCompilers: Unit = {
+    
+  }
+  def buildLiveCompilers: Unit = {
+    
+  }
+  def buildPrepare: Unit = {
+    
+  }
+  def buildStandard: Unit = {
+    
+  }
+  
+  def getDependencies: List[org.eclipse.aether.graph.Dependency] = List() 
+    
+ 
+  def isArtifact(art: org.eclipse.aether.artifact.Artifact): Boolean = false
+  
+ 
+
+  
+  
+}

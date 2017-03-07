@@ -5,6 +5,7 @@ import org.odfi.indesign.core.heart.Heart
 import org.odfi.indesign.core.heart.HeartTask
 import org.odfi.wsb.fwapp.framework.FWAppFrameworkView
 import org.odfi.indesign.ide.core.ui.utils.ErrorsHelpView
+import org.odfi.indesign.core.harvest.HarvestedResource
 
 trait TasksView extends FWAppFrameworkView with ErrorsHelpView {
 
@@ -23,6 +24,11 @@ trait TasksView extends FWAppFrameworkView with ErrorsHelpView {
 
   // Utilities
   //--------------
+
+  def resourceTaskButton(r: HarvestedResource, id: String)(startName: String, stopName: String)(content: HeartTask[Any] => Any) = {
+    taskButton(r.getId + "." + id)(startName, stopName)(content)
+  }
+
   /**
    * Button for fast task creation
    */
@@ -30,16 +36,19 @@ trait TasksView extends FWAppFrameworkView with ErrorsHelpView {
 
     // Check Task is not running
     //--------------------
-    "settings icon" :: i {
 
-    }
     Heart.running(id) match {
-      case Some(t) if(t.isRunning) =>
+      case Some(t) if (t.isRunning) =>
 
         //-- Create Button
-      
-        "ui button" :: button(stopName) {
 
+        "ui button" :: button("") {
+
+          "settings icon" :: i {
+
+          }
+
+          text(stopName)
           /*onClickReload {
             
             Heart.killTask(t)
@@ -50,7 +59,13 @@ trait TasksView extends FWAppFrameworkView with ErrorsHelpView {
       case other =>
 
         //-- Create Button
-        "ui button" :: button(startName) {
+        "ui button" :: button("") {
+
+          "settings icon" :: i {
+
+          }
+
+          text(startName)
 
           onClickReload {
 
@@ -72,7 +87,7 @@ trait TasksView extends FWAppFrameworkView with ErrorsHelpView {
           }
 
         }
-        
+
         //-- last error
         other match {
           case Some(task) =>
@@ -80,7 +95,7 @@ trait TasksView extends FWAppFrameworkView with ErrorsHelpView {
               text("Last Run")
               errorsStat(task)
             }
-          case None => 
+          case None =>
         }
     }
 

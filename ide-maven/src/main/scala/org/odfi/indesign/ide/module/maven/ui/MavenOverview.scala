@@ -13,8 +13,11 @@ import org.odfi.indesign.ide.core.ui.main.IDEBaseView
 import org.odfi.wsb.fwapp.module.jquery.JQueryTreetable
 import org.odfi.indesign.ide.core.ui.tasks.TasksView
 import org.odfi.indesign.ide.core.ui.utils.ErrorsHelpView
+import org.odfi.indesign.ide.module.scala.ScalaProjectHarvester
+import org.odfi.indesign.ide.module.scala.ScalaAppHarvester
+import org.odfi.indesign.ide.module.scala.ScalaAppSourceFile
 
-class MavenOverview extends IDEBaseView with JQueryTreetable with TasksView with ErrorsHelpView{
+class MavenOverview extends IDEBaseView with JQueryTreetable with TasksView with ErrorsHelpView {
 
   override def getDisplayName = "Maven Overview"
 
@@ -38,6 +41,26 @@ class MavenOverview extends IDEBaseView with JQueryTreetable with TasksView with
             case None =>
               "ui warning message" :: text("Libraries and compilation Classpath have not been prepared")
             case Some(cd) =>
+
+              //-- Look up Main files
+              ScalaProjectHarvester.getChildHarvesters[ScalaAppHarvester] match {
+                case Some(appHarvesters) =>
+                  ul {
+                    appHarvesters.foreach {
+                      appH =>
+                        appH.getResourcesByTypeAndUpchainParent[ScalaAppSourceFile,MavenProjectResource](project).foreach {
+                          mainFile => 
+                            li {
+                              text(mainFile.path.toFile().getCanonicalPath)
+                            }
+                        }
+                    }
+                  }
+
+                case None =>
+
+              }
+
           }
 
           // Generate Sources
@@ -50,24 +73,45 @@ class MavenOverview extends IDEBaseView with JQueryTreetable with TasksView with
       case default =>
         //Thread.currentThread().setContextClassLoader(MavenModule.getClass.getClassLoader)
         div {
-          h1("Maven Projects Overview") {
+
+          h2("Maven Projects Overview") {
 
           }
 
           //-- Get Projects
+          //-------------------
           var projects = MavenProjectHarvester.getResourcesOfType[MavenProjectResource]
 
           projects.size match {
             case 0 =>
-              "ui info message" :: p("No Maven Projects Detected")
+              "ui info message" :: p(s"""
+                
+                
+                No Maven Projects Detected
+                
+                To Add a project, you could add a Source ${a("/ide/site/sources")(text("here"))}
+                
+                """)
             case _ =>
+
+              // Projects Menu
+              //----------
+              "ui menu" :: div {
+                projects.foreach {
+                  p =>
+
+                    "item" :: a("#")(text(p.getDisplayName))
+
+                }
+              }
+
               "ui raised segment" :: div {
 
                 importHTML(<a class="ui blue ribbon label">Maven Projects</a>)
                 p("""Please find here a summary of the Detected Maven Projects""")
 
                 "ui table  treetable" :: table {
-                  thead("Name", "State", "Actions", "Location")
+                  thead("Name", "State", "Live Builders", "Actions", "Location")
                   tbody {
                     projects.foreach {
                       p =>
@@ -85,18 +129,37 @@ class MavenOverview extends IDEBaseView with JQueryTreetable with TasksView with
                           //-- State
                           td("") {
 
-                             errorsStat(p)
+                            errorsStat(p)
 
                           }
+
+                          //-- Live Builders
+                          td("") {
+
+                            p.liveCompilers.foreach {
+                              lc =>
+                                "ui button" :: button(lc.getDisplayName) {
+
+                                }
+                            }
+
+                            resourceTaskButton(p, "livecompilers.refresh")("Refresh", "Running...") {
+                              task =>
+                                p.buildLiveCompilers
+                            }
+                            //taskButton((p.getId+":build")
+
+                          }
+
                           //-- Actions
                           td("") {
 
                             // Build Standard
-                            taskButton(p.getId+":build")("Build Full", "Build in Progress") {
-                              task => 
+                            taskButton(p.getId + ":build")("Build Full", "Build in Progress") {
+                              task =>
                                 p.buildFully
                             }
-                            
+
                             label("Enable Build") {
                               input {
                                 bindValue {
@@ -104,7 +167,7 @@ class MavenOverview extends IDEBaseView with JQueryTreetable with TasksView with
                                 }
                               }
                             }
-                            
+
                           }
                           //-- Locaion
                           td(p.path.toFile().getCanonicalPath) {
@@ -120,14 +183,14 @@ class MavenOverview extends IDEBaseView with JQueryTreetable with TasksView with
                             tr {
                               treeTableLineId(s"${p.getId}:${upstreamProject.getId}")
                               treeTableParent(p.getId)
-                              
+
                               td("Depends on: " + upstreamProject.getDisplayName) {
 
                               }
 
                               // State
                               td("") {
-                               
+
                                 upstreamProject.hasErrors match {
                                   case true =>
                                     classes("negative")
@@ -141,15 +204,15 @@ class MavenOverview extends IDEBaseView with JQueryTreetable with TasksView with
 
                                 }
                               }
-                              
+
                               // Actions
                               td("") {
-                                
+
                               }
-                              
+
                               // Location
                               td("") {
-                                
+
                               }
 
                             }

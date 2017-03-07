@@ -3,9 +3,12 @@ package org.odfi.indesign.ide.core.project
 import org.odfi.indesign.core.harvest.Harvester
 import org.odfi.indesign.core.config.ConfigSupport
 import org.odfi.indesign.core.harvest.fs.HarvestedFile
-import java.nio.file.Path
-import java.io.FileNotFoundException
+
 import org.odfi.indesign.core.config.FolderWithConfig
+import org.odfi.indesign.core.harvest.HarvestedResource
+
+import java.nio.file.Path 
+import java.io.FileNotFoundException
 
 object ProjectsHarvester extends Harvester with ConfigSupport {
   
@@ -36,6 +39,12 @@ object ProjectsHarvester extends Harvester with ConfigSupport {
   }
   
   
+  
+}
+
+trait Project extends HarvestedResource {
+  
+  def getProjectId : String
   
 }
 

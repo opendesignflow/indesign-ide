@@ -10,21 +10,21 @@ import com.idyria.osi.tea.logging.TLog
 import org.odfi.indesign.core.artifactresolver.AetherResolver
 import org.odfi.indesign.core.brain.Brain
 import org.odfi.indesign.core.harvest.fs.HarvestedFile
-import org.odfi.indesign.ide.module.maven.resolver.MavenProjectIndesignWorkspaceReader
+import org.odfi.indesign.ide.module.maven.resolver.MavenProjectWorkspaceReader
 import org.odfi.indesign.core.brain.artifact.ArtifactRegion
 
 class MavenRegionRuntimeClassdomainTest extends FunSuite with GivenWhenThen {
 
   test("Dependent Region have parent ClassDomain correctly set") {
 
-    TLog.setLevel(classOf[MavenProjectIndesignWorkspaceReader], TLog.Level.FULL)
+    TLog.setLevel(classOf[MavenProjectWorkspaceReader], TLog.Level.FULL)
     TLog.setLevel(classOf[MavenExternalBrainRegion], TLog.Level.FULL)
 
     //---------------------------
     // Create External Regions
     //---------------------------
     var builder = new MavenExternalBrainRegionBuilder
-    AetherResolver.session.setWorkspaceReader(MavenProjectIndesignWorkspaceReader)
+    AetherResolver.session.setWorkspaceReader(MavenProjectWorkspaceReader)
     var regionA = builder.build(new File("src/test/testFS/maven-app-dep").toURI().toURL).asInstanceOf[MavenExternalBrainRegion]
     var regionB = builder.build(new File("src/test/testFS/maven-app-internaldep").toURI().toURL).asInstanceOf[MavenExternalBrainRegion]
 
@@ -63,14 +63,14 @@ class MavenRegionRuntimeClassdomainTest extends FunSuite with GivenWhenThen {
 
   test("Two Dependent Regions runtime Module have correct dependend class loading") {
 
-    TLog.setLevel(classOf[MavenProjectIndesignWorkspaceReader], TLog.Level.FULL)
+    TLog.setLevel(classOf[MavenProjectWorkspaceReader], TLog.Level.FULL)
     TLog.setLevel(classOf[MavenExternalBrainRegion], TLog.Level.FULL)
 
     //---------------------------
     // Create External Regions
     //---------------------------
     var builder = new MavenExternalBrainRegionBuilder
-    AetherResolver.session.setWorkspaceReader(MavenProjectIndesignWorkspaceReader)
+    AetherResolver.session.setWorkspaceReader(MavenProjectWorkspaceReader)
 
     var regionA = builder.build(new File("src/test/testFS/maven-app-dep").toURI().toURL).asInstanceOf[MavenExternalBrainRegion]
     var regionB = builder.build(new File("src/test/testFS/maven-app-internaldep").toURI().toURL).asInstanceOf[MavenExternalBrainRegion]
@@ -94,14 +94,14 @@ class MavenRegionRuntimeClassdomainTest extends FunSuite with GivenWhenThen {
     //-----------------------------
     // Load B Actual Module, should call to same instance of A
     //-----------------------------
-    regionB.addRegionClass("appInternalDep.test.InternalAppDepModule$")
-    regionA.addRegionClass("appDep.test.AppDepModule$")
+    //regionB.addRegionClass("appInternalDep.test.InternalAppDepModule$")
+    //regionA.addRegionClass("appDep.test.AppDepModule$")
 
   }
 
   test("One parent region, on child, and another needs the two previous") {
 
-    TLog.setLevel(classOf[MavenProjectIndesignWorkspaceReader], TLog.Level.FULL)
+    TLog.setLevel(classOf[MavenProjectWorkspaceReader], TLog.Level.FULL)
     TLog.setLevel(classOf[MavenExternalBrainRegion], TLog.Level.FULL)
     TLog.setLevel(classOf[ArtifactRegion], TLog.Level.FULL)
     
@@ -109,7 +109,7 @@ class MavenRegionRuntimeClassdomainTest extends FunSuite with GivenWhenThen {
     // Create REgions
     //------------------------------
     var builder = new MavenExternalBrainRegionBuilder
-    AetherResolver.session.setWorkspaceReader(MavenProjectIndesignWorkspaceReader)
+    AetherResolver.session.setWorkspaceReader(MavenProjectWorkspaceReader)
     
     var regions = List("maven-app-needstwo", "maven-app-dep", "maven-app-internaldep").map {
       regionName =>

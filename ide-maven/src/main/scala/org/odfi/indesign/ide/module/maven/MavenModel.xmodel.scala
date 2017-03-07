@@ -13,13 +13,13 @@ object MavenModels extends ModelBuilder {
 
   "project" is {
     elementsStack.head.makeTraitAndUseCustomImplementation
-    
+
     "groupId" ofType ("string")
     "artifactId" ofType ("string")
     "version" ofType ("string")
     "package" ofType ("string")
     "name" ofType ("string")
-    "description" ofType("string")
+    "description" ofType ("string")
 
     // Parents 
     //-------------------
@@ -29,33 +29,33 @@ object MavenModels extends ModelBuilder {
       "version" ofType ("string")
       "relativePath" ofType "string"
     }
-    
+
     // Repositories
     //------------------
     "pluginRepositories" is {
-      
+
       "pluginRepository" multiple {
         "id" ofType "string"
         "name" ofType "string"
         "url" ofType "url"
-        
+
         "snapshots" is {
           "enabled" ofType "boolean" default "true"
         }
-        
+
       }
     }
     "repositories" is {
-      
+
       "repository" multiple {
         "id" ofType "string"
         "name" ofType "string"
         "url" ofType "url"
-        
+
         "snapshots" is {
           "enabled" ofType "boolean" default "true"
         }
-        
+
       }
     }
 
@@ -64,16 +64,44 @@ object MavenModels extends ModelBuilder {
     "dependencies" is {
       "dependency" multiple {
         "groupId" ofType ("string")
-      "artifactId" ofType ("string")
-      "version" ofType ("string")
-      "scope" ofType("string")
-      
+        "artifactId" ofType ("string")
+        "version" ofType ("string")
+        "scope" ofType ("string")
+
       }
     }
+
+  }
+  // EOF Project
+
+  // Metadata
+  //-------------
+  "metadata" is {
+
+    "groupId" ofType ("string")
+    "artifactId" ofType ("string")
+    "version" ofType ("string")
     
-    
-    
-    
+    "versioning" is {
+      
+      "snapshot" is {
+        "timestamp" ofType "string"
+        "buildNumber" ofType "integer"
+      }
+      
+      "snapshotVersions" is {
+        
+        "snapshotVersion" multiple {
+          "extension" ofType "string"
+          "value" ofType "string"
+          "updated" ofType "long"
+          
+        }
+        
+      }
+      
+    }
+
   }
 
 }

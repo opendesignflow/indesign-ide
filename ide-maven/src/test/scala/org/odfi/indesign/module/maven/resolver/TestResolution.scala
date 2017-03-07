@@ -6,7 +6,7 @@ import org.odfi.indesign.core.artifactresolver.AetherResolver
 object TestResolution extends App {
   
   
-  AetherResolver.session.setWorkspaceReader( MavenProjectIndesignWorkspaceReader)
+  AetherResolver.session.setWorkspaceReader( MavenProjectWorkspaceReader)
   
   var res = AetherResolver.
   resolveArtifactAndDependencies("com.idyria.osi.wsb","wsb-webapp","2.0.0-SNAPSHOT")

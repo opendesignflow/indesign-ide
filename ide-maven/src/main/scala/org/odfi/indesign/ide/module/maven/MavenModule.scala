@@ -19,6 +19,9 @@ import org.odfi.indesign.ide.module.maven.embedder.EmbeddedMaven
 import org.apache.maven.project.MavenProject
 import org.odfi.indesign.ide.core.project.ProjectModule
 import org.odfi.indesign.core.harvest.fs.FileSystemHarvester
+import org.odfi.indesign.ide.module.maven.ui.MavenGUI
+import org.odfi.indesign.core.artifactresolver.AetherResolver
+import org.odfi.indesign.ide.module.maven.resolver.MavenProjectWorkspaceReader
 
 object MavenModule extends IndesignModule {
 
@@ -100,6 +103,7 @@ object MavenModule extends IndesignModule {
 
     requireModule(ArtifactResolverModule)
     requireModule(ProjectModule)
+    requireModule(MavenGUI)
   
     //-- Register Maven Region Builder
     //ExternalBrainRegion.addBuilder(new MavenExternalBrainRegionBuilder)
@@ -112,7 +116,8 @@ object MavenModule extends IndesignModule {
     ProjectsHarvester --> MavenProjectHarvester
 
     // MavenProjectIndesignWorkspaceReader.resetAllProjects
-    //AetherResolver.session.setWorkspaceReader(MavenProjectIndesignWorkspaceReader)
+    
+    AetherResolver.session.setWorkspaceReader(MavenProjectWorkspaceReader)
 
     //println("Loading Maven WWW View---------: "+WWWViewHarvester.hashCode())
 
@@ -140,7 +145,8 @@ object MavenModule extends IndesignModule {
 
   this.onShutdown {
     println("Shutting down Maven module: " + Brain.getResources)
-
+    MavenProjectHarvester.clean
+    
     //-- Register Maven Region Builder
     //ExternalBrainRegion.addBuilder(new MavenExternalBrainRegionBuilder)
 

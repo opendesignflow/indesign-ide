@@ -5,13 +5,14 @@ import org.eclipse.aether.artifact.Artifact
 import org.odfi.indesign.ide.core.compiler.LiveCompiler
 import scala.reflect.ClassTag
 import org.odfi.indesign.core.brain.BrainLifecycle
+import org.eclipse.aether.graph.Dependency
 
-trait BuildableProject extends HarvestedResource with BrainLifecycle {
+trait BuildableProject extends Project with BrainLifecycle {
   
   
   // Dependencies
   //--------------------
-  def getDependencies : List[Artifact]
+  def getDependencies : List[Dependency]
   def isArtifact(art:Artifact) : Boolean
   
   // Build Interface
@@ -48,6 +49,14 @@ trait BuildableProject extends HarvestedResource with BrainLifecycle {
    * "Daily life" build
    */
   def buildStandard
+  
+  // Build Watch interface
+  //-----------------
+  def onBuildOutputChanged(cl: => Any) = {
+    this.on("build.output.changed") {
+      cl
+    }
+  }
   
   // Live Compiler
   //-----------------

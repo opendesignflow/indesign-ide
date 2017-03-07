@@ -45,7 +45,7 @@ class FSConfigView extends IDEBaseView with LocalGUIExtensionsView {
         case true => 
           "@reload" :: selectDirectoryButton("Add Directory to Sources") {
             folder => 
-              FileSystemHarvester.addPath(folder)
+              //FileSystemHarvester.addPath(folder)
               FileSystemHarvester.config match {
                 case Some(conf) => 
                   conf.setUniqueKeyFirstValue("file",folder.getCanonicalPath)

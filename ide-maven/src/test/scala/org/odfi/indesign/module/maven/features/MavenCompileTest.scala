@@ -15,6 +15,7 @@ import org.odfi.indesign.core.brain.Brain
 import org.odfi.indesign.core.harvest.fs.FileSystemHarvester
 import org.odfi.indesign.ide.core.sources.SourceFile
 import org.odfi.indesign.ide.module.scala.ScalaSourceFile
+import org.odfi.indesign.core.harvest.fs.HarvestedFile
 
 
 class MavenCompileTest  extends FunSuite {
@@ -32,7 +33,7 @@ class MavenCompileTest  extends FunSuite {
     TLog.setLevel(classOf[MavenProjectResource], TLog.Level.FULL)
     TLog.setLevel(classOf[FileSystemHarvester], TLog.Level.FULL)
     
-    var project = new MavenProjectResource(new File("src/test/testFS/maven-app-oneerror/").toPath())
+    var project = new MavenProjectResource(new HarvestedFile(new File("src/test/testFS/maven-app-oneerror/").toPath()))
 
     MavenProjectHarvester.gatherPermanent(project)
   

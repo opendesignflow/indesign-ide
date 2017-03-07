@@ -22,8 +22,8 @@ class MavenCrossProjectResolverTest extends FunSuite {
     
     // Set Resolver Workspace reader to MavenProjectReader
     //--------------
-    TLog.setLevel(classOf[MavenProjectIndesignWorkspaceReader], TLog.Level.FULL)
-    AetherResolver.session.setWorkspaceReader( MavenProjectIndesignWorkspaceReader)
+    TLog.setLevel(classOf[MavenProjectWorkspaceReader], TLog.Level.FULL)
+    AetherResolver.session.setWorkspaceReader( MavenProjectWorkspaceReader)
     
     // Harvest Projects
     //------------

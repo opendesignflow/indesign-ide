@@ -10,6 +10,8 @@ import java.nio.file.Path
 
 object IntelliJModule extends HarvesterModule {
 
+  override def getDisplayName = "IntelliJ"
+  
   this.onInit {
     addDerivedResource(new IntelliJOverview)
   }

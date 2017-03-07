@@ -37,11 +37,14 @@ import java.net.URLClassLoader
 import java.net.URI
 import java.net.URL
 import org.apache.maven.DefaultMaven
+import org.apache.maven.project.DefaultDependencyResolutionRequest
+import org.apache.maven.project.ProjectDependenciesResolver
+import scala.collection.convert.DecorateAsScala
 
 
 
 
-class EmbeddedMaven( val configHome : File = new File(new File( sys.props("user.home")), ".m2") ) extends ClassDomainSupport {
+class EmbeddedMaven( val configHome : File = new File(new File( sys.props("user.home")), ".m2") ) extends ClassDomainSupport  with DecorateAsScala {
 
   // Classworld
   //---------------
@@ -109,7 +112,32 @@ class EmbeddedMaven( val configHome : File = new File(new File( sys.props("user.
 
   // High Level Utils
   //-------------------
-
+ 
+  def resolveDependencies(project:MavenProject) = {
+    inMavenRealm {
+      container =>
+      //-- Prepare
+      var dpr = new DefaultDependencyResolutionRequest
+      dpr.setMavenProject(project)
+      dpr.setRepositorySession(AetherResolver.session)
+      
+      //-- Execute
+      var resolver = container.lookup(classOf[ProjectDependenciesResolver])
+      var result = resolver.resolve(dpr)
+      
+      result.getCollectionErrors.size() match {
+        case 0 if (result.getUnresolvedDependencies.size()>0) =>
+          EError(new UnresolvedDependenciesError(result.getUnresolvedDependencies.asScala.toList))
+        case errors if (errors>0) => 
+          EError(result.getCollectionErrors.get(0))
+          
+        case other => 
+          ESome(result.getResolvedDependencies.asScala.toList)
+      }
+      
+    }
+  }
+  
   /**
    * 
    */
@@ -117,8 +145,9 @@ class EmbeddedMaven( val configHome : File = new File(new File( sys.props("user.
     inMavenRealm {
       container =>
         var builder = container.lookup(classOf[ProjectBuilder])
-
+        
         var pbr = new DefaultProjectBuildingRequest
+       // pbr.setResolveDependencies(false)
         pbr.setRepositorySession(AetherResolver.session)
       
         

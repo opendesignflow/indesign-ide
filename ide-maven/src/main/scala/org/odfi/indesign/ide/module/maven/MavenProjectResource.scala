@@ -2,47 +2,189 @@ package org.odfi.indesign.ide.module.maven
 
 import java.io.File
 import java.net.URL
-import java.nio.file.Path
+import java.nio.file.Files
 
+import scala.collection.JavaConversions._
+import scala.reflect.ClassTag
+
+import org.apache.maven.project.MavenProject
 import org.eclipse.aether.artifact.Artifact
+import org.eclipse.aether.artifact.DefaultArtifact
 import org.odfi.indesign.core.artifactresolver.AetherResolver
-import org.odfi.indesign.core.brain.Brain
+import org.odfi.indesign.core.harvest.Harvest
+import org.odfi.indesign.core.harvest.HarvestedResource
+import org.odfi.indesign.core.harvest.fs.FSGlobalWatch
 import org.odfi.indesign.core.harvest.fs.HarvestedFile
 import org.odfi.indesign.core.module.lucene.LuceneIndexResource
-import org.odfi.indesign.ide.core.project.BuildableProject
+import org.odfi.indesign.ide.core.compiler.LiveCompiler
+import org.odfi.indesign.ide.core.compiler.LiveCompilerError
+import org.odfi.indesign.ide.core.project.BuildableProjectFolder
+import org.odfi.indesign.ide.core.project.jvm.JavaOutputProject
+import org.odfi.indesign.ide.module.maven.embedder.EmbeddedMaven
+import org.odfi.indesign.ide.module.ooxoo.OOXOOLiveCompiler
+import org.odfi.indesign.ide.module.scala.ScalaSourceFile
+import org.odfi.indesign.ide.module.scala.compiler.ScalaMavenLiveCompiler
 
 import com.idyria.osi.tea.compile.ClassDomainContainer
 import com.idyria.osi.tea.compile.ClassDomainSupport
 import com.idyria.osi.tea.compile.IDCompiler
 import com.idyria.osi.tea.files.FileWatcherAdvanced
-import org.odfi.indesign.ide.core.project.BuildableProjectFolder
-import org.apache.maven.model.building.ModelBuildingResult
-import org.apache.maven.model.Model
-import org.apache.maven.project.ProjectBuildingResult
-import org.apache.maven.project.MavenProject
+import org.odfi.indesign.ide.module.maven.resolver.MavenProjectWorkspaceReader
+import org.eclipse.aether.graph.Dependency
+import org.odfi.indesign.core.harvest.fs.FileSystemIgnoreProvider
 
-import scala.collection.JavaConversions._
-import org.apache.maven.model.Dependency
-import org.eclipse.aether.artifact.DefaultArtifact
-import org.odfi.indesign.ide.module.scala.ScalaSourceFile
-import org.odfi.indesign.ide.module.maven.embedder.EmbeddedMaven
-import org.odfi.indesign.ide.core.compiler.LiveCompilerError
-import org.odfi.indesign.ide.module.scala.compiler.ScalaLiveCompiler
-import org.odfi.indesign.ide.module.scala.compiler.ScalaMavenLiveCompiler
-import org.odfi.indesign.ide.core.compiler.LiveCompiler
-import org.odfi.indesign.ide.module.ooxoo.OOXOOLiveCompiler
-
-class MavenProjectResource(p: Path) extends BuildableProjectFolder(p) with ClassDomainSupport with LuceneIndexResource with ClassDomainContainer {
+class MavenProjectResource(p: HarvestedFile) extends BuildableProjectFolder(p.path)
+    with ClassDomainSupport
+    with LuceneIndexResource
+    with ClassDomainContainer
+    with JavaOutputProject
+    with FileSystemIgnoreProvider {
 
   //-- Get Pom File 
-  var pomFile = new File(p.toFile(), "pom.xml")
+  var pomFile = new File(p.path.toFile(), "pom.xml")
+
+  this.onProcess {
+
+    println("Maven project Processing: " + this.getProjectId)
+
+    this.resetErrors
+
+    //-- Derive when added
+    deriveFrom(p)
+
+    //-- Build Dependencies
+    buildDependencies
+    //recreateClassDomain
+
+    //-- Reset Workspace reader to consider new project
+    MavenProjectWorkspaceReader.resetAllProjects
+
+  }
+
+  def fileIgnore(f: File) = {
+    f match {
+      case target if (target.getName == "target") =>
+        //println("Blocking: "+f)
+        true
+      case isPom if (isPom.getCanonicalPath == pomFile.getCanonicalPath) =>
+        //println("Blocking: "+f)
+        true
+      case other =>
+
+        false
+    }
+  }
 
   //-- File Watcher for this project
   //var watcher = new FileWatcher
 
+  // Class Domain Create
+  //--------------
+
+  var beautyTime = 5000
+  var lastTime = 0L
+  this.onRebuildClassDomain {
+
+    println("Rebuilding CD: " + this.originalHarvester)
+    this.originalHarvester match {
+      case Some(ph) =>
+
+        var cd = this.classdomain.get
+
+        //-- Add output
+        this.getMavenModel match {
+          case ESome(model) =>
+
+            //-- Add Output to Class loader
+            println(s"Adding output folder to new cd: " + cd)
+
+            //-- Print Deps
+            //buildDependencies
+            /*this.getDependenciesURL.foreach {
+              url =>
+                println(s"Deps: " + url)
+            }*/
+
+            //buildDependencies
+
+            //println(s"Project output is: "+projectOutput)
+            cd.addURL(new File(model.getBuild.getOutputDirectory).getCanonicalFile.toURI().toURL())
+
+            getDependenciesURL.foreach {
+              url =>
+                cd.addURL(url)
+            }
+
+            FSGlobalWatch.watcher.isMonitoredBy(this, new File(model.getBuild.getOutputDirectory)) match {
+              case true =>
+              case false =>
+
+                println(s"Starting Watch on $this  ${this.hashCode()} -> ${model.getBuild.getOutputDirectory}")
+                //var e = new Throwable
+                //e.printStackTrace(System.out)
+                FSGlobalWatch.watcher.watchDirectoryRecursive(this, new File(model.getBuild.getOutputDirectory)) {
+                  f =>
+                    println(s"######### Detected compilation on $this (${this.isTainted}) ${this.hashCode()}, reloading class, origin file is $f ###########")
+                    if (lastTime < (System.currentTimeMillis() - beautyTime)) {
+                      lastTime = System.currentTimeMillis()
+                      Thread.sleep(beautyTime / 4)
+
+                      //println(s"Cleaning")
+                      // This is running on the old classloader
+                      this.classdomain match {
+                        case Some(cd) =>
+                          this.getDerivedResources[HarvestedResource].foreach {
+                            case r if (r.getClass.getClassLoader == this.classdomain.get) =>
+                              println(s"need to clean: " + r)
+                              this.cleanDerivedResource(r)
+                            //  r.clean
+                            case r =>
+                            //println(s"no need to clean: "+r+ " -> res has cl: "+r.getClass.getClassLoader+",current CL "+cd)
+                          }
+                        case None =>
+                      }
+
+                      //-- Rebuild classdomain
+                      println("Replacing old CD: "+this.classdomain.get)
+                      recreateClassDomain
+                      MavenProjectHarvester.findDownStreamProjects(this).foreach {
+                        p => 
+                          println(s"Replacing CD on: "+p)
+                          p.getDerivedResources[HarvestedResource].foreach {
+                            case r if (r.getClass.getClassLoader == p.classdomain.get) =>
+                              println(s"need to clean: " + r)
+                              p.cleanDerivedResource(r)
+                            //  r.clean
+                            case r =>
+                            //println(s"no need to clean: "+r+ " -> res has cl: "+r.getClass.getClassLoader+",current CL "+cd)
+                          }
+                          p.recreateClassDomain
+                      }
+
+                      //this.reload
+                      //this.harvest
+                      // Harvest.run
+                      Harvest.run
+                    }
+                }
+
+                this.onClean {
+                  println(s"**** Remove compilation watcher")
+                  FSGlobalWatch.watcher.cleanFor(this)
+                }
+
+            }
+
+          case other =>
+        }
+
+      case None =>
+    }
+  }
+
   // Configuration thing
   //----------------
-  this.config
+  //this.config
 
   //-- Maven Model
   //------------
@@ -51,25 +193,55 @@ class MavenProjectResource(p: Path) extends BuildableProjectFolder(p) with Class
   var projectModel = project(pomFile.toURI().toURL())
 
   var buildProjectModel: ErrorOption[MavenProject] = ENone
+  var buildInProgress = false
+  def getMavenModel = buildInProgress match {
+    case false =>
+      buildProjectModel match {
 
-  def getMavenModel = buildProjectModel match {
+        case ENone =>
 
-    case ENone =>
-      buildProjectModel = MavenModule.buildMavenProject(pomFile)
-      buildProjectModel
-    case other: EError =>
-      addError(other.value)
-      other
-    case other =>
-      other
+          //-- Maven Model is rebuild
+          buildInProgress = true
+          try {
+          MavenModule.buildMavenProject(pomFile) match {
+            case ESome(p) =>
+              buildProjectModel = ESome(p)
 
+              //-- Rebuild Class Domain
+              buildInvalidateDependencies
+
+            case other: EError =>
+              buildProjectModel = other
+              addError(other.value)
+              //other.value.printStackTrace()
+              other
+            case other =>
+              buildProjectModel = other
+          }
+          
+          } finally {
+             buildInProgress = false
+          }
+
+          buildProjectModel
+
+        case other: EError =>
+          //addError(other.value)
+          //other.value.printStackTrace()
+          other
+        case other =>
+          other
+      }
+    case true => 
+      ENone
   }
 
   def isModelBuild = buildProjectModel.isDefined
 
   //-- ID Stuff
-  // override def getId = s"${projectModel.getGroupId}:${projectModel.artifactId}:${projectModel.getVersion}"
-  override def getId = getMavenModel match {
+  override def getId = s"Maven:${p.path.toFile()}"
+
+  def getProjectId = getMavenModel match {
     case ESome(project) => s"${project.getGroupId}:${project.getArtifactId}:${project.getVersion}"
     case other if (projectModel == null) => super.getId
     case other => s"${projectModel.getGroupId}:${projectModel.getArtifactId}:${projectModel.getVersion}"
@@ -77,7 +249,7 @@ class MavenProjectResource(p: Path) extends BuildableProjectFolder(p) with Class
   override def getDisplayName = getMavenModel match {
     case ESome(project) if (project.getName != null && project.getName != "") => project.getName
     case EError(error) if (projectModel.name != null && projectModel.name != "") => projectModel.name
-    case other => getId
+    case other => getProjectId
   }
 
   def getArtifactId = getMavenModel match {
@@ -98,15 +270,16 @@ class MavenProjectResource(p: Path) extends BuildableProjectFolder(p) with Class
   /**
    * On File Change, update model and invalidate dependencies
    */
-  MavenProjectResource.watcher.onFileChange(this, pomFile) {
+  FSGlobalWatch.watcher.onFileChange(this, pomFile) {
     file =>
       this.projectModel = project(pomFile.toURI().toURL())
       this.buildProjectModel = ENone
     //this.dependencies = None
   }
+  // MavenProjectResource.watcher.
 
   //-- Indexing
-  def getLuceneDirectory = new File(p.toFile, ".indesign-lucene-index")
+  def getLuceneDirectory = new File(p.path.toFile, ".indesign-lucene-index")
 
   //-- WWW VIew
   //var view = new MavenWWWView(this)
@@ -164,7 +337,7 @@ class MavenProjectResource(p: Path) extends BuildableProjectFolder(p) with Class
     //-- look for sources
     var toCompile = this.getDerivedResources[HarvestedFile].collect {
       case r if (r.hasDerivedResourceOfType[ScalaSourceFile]) =>
-        println(s"To compile: " + r)
+        // println(s"To compile: " + r)
         //r.getDerivedResources[ScalaSourceFile].head
         r.path.toFile()
 
@@ -182,9 +355,77 @@ class MavenProjectResource(p: Path) extends BuildableProjectFolder(p) with Class
 
   }
 
+  // Discoveries
+  //-----------------
+  override def discoverType[CT <: Any](implicit tag: ClassTag[CT]) = {
+
+    this.getMavenModel match {
+      case ESome(model) =>
+
+        //println(s"Model Build -> "+this.classdomain)
+        this.classdomain match {
+
+          case Some(cd) =>
+            println(s"Discovering using cd: "+cd)
+            var folder = new File(model.getBuild.getOutputDirectory).getCanonicalFile
+
+            var stream = Files.walk(folder.toPath())
+            var foundTypes = List[Class[CT]]()
+            stream.forEach {
+              f =>
+
+                f.toFile.getName.endsWith(".class") match {
+                  case true =>
+                    var className = f.toString().replace(folder.getCanonicalPath + File.separator, "").replace(File.separator.toString, ".").replace(".class", "")
+                    // println(s"Discover ${tag} Lookin at: " + className)
+
+                    try {
+
+                      var cl = cd.loadClassFromFile(className, f.toFile)
+                      // var cl = cd.loadClass(className)
+
+                      tag.runtimeClass.isAssignableFrom(cl) match {
+                        case true =>
+                          foundTypes = foundTypes :+ cl.asInstanceOf[Class[CT]]
+                        case false =>
+                      }
+                    } catch {
+                      case e: Throwable =>
+                        println(s"Fail : " + e.getLocalizedMessage)
+                      //e.printStackTrace()
+
+                    }
+                  case false =>
+
+                }
+              /*f.getFileName.toString().endsWith("$.class") match {
+            // Don't Check objects
+            case true => 
+          }*/
+
+              // var relativeF = f.resolve(outputPath.toPath())
+              //println("Lookin at: "+relativeF.toString())
+              //if (f.getFileName.toString().endsWith("$.class")) {
+
+            }
+
+            foundTypes
+
+          //-- Don't try without CD
+          case None =>
+            List[Class[CT]]()
+
+        }
+
+      //-- Don't try without Project Model
+      case other =>
+        List[Class[CT]]()
+    }
+  }
+
   // Dependencies
   //---------------------
-  var dependencies = List[Artifact]()
+  var dependencies = List[Dependency]()
   var dependenciesURLS = List[URL]()
 
   /**
@@ -227,17 +468,7 @@ class MavenProjectResource(p: Path) extends BuildableProjectFolder(p) with Class
 
   }
 
-  def getDependencies = getMavenModel match {
-    case ESome(project) =>
-      // println(s"Getting deps: "+project.getDependencies.toList)
-      project.getDependencies.map {
-        mart =>
-          new DefaultArtifact(mart.getGroupId, mart.getArtifactId, "jar", mart.getVersion)
-      }.toList
-    case other =>
-      projectModel.getArtifacts
-
-  }
+  def getDependencies = dependencies
 
   def getDependenciesURL = dependenciesURLS
 
@@ -260,43 +491,10 @@ class MavenProjectResource(p: Path) extends BuildableProjectFolder(p) with Class
   //-- Classdomain
   // var classDomain = new ClassDomain(Thread.currentThread().getContextClassLoader)
   //var classDomain = new ClassDomain(classOf[Brain].getClassLoader)
-  this.createNewClassDomain(classOf[Brain].getClassLoader)
+  //this.createNewClassDomain(classOf[Brain].getClassLoader)
 
   //-- Compiler
   var compiler: Option[IDCompiler] = None
-
-  this.onAdded {
-    case h if (h == MavenProjectHarvester) =>
-
-    //updateDependencies
-
-    //view.originalHarvester = this.originalHarvester
-    //WWWViewHarvester.deliverDirect(view)
-
-    // println(s"Maven Project resource added to harvster")
-    //MavenModule.addSubRegion(this)
-
-    //-- 
-
-    case _ =>
-  }
-
-  this.onProcess {
-    //println(s"Creating Compiler for MavenProject")
-
-    // watcher.start
-
-    compiler match {
-      case None =>
-
-      /*this.compiler = Some(new IDCompiler)
-        this.classDomain.addURL(new File(this.path.toFile(),"target/classes").toURI().toURL() )
-        this.compiler.get.addSourceOutputFolders((new File(this.path.toFile(),"src/main/scala"),new File(this.path.toFile(),"target/classes")))*/
-
-      case _ =>
-    }
-
-  }
 
   /*def resetClassDomain: Unit = {
 
@@ -327,37 +525,90 @@ class MavenProjectResource(p: Path) extends BuildableProjectFolder(p) with Class
   }*/
 
   def buildInvalidateDependencies = {
+
+    //-- Tain Class Domain
     this.taintClassDomain
-    this.classdomain = None
+
   }
 
-  def buildDependencies = this.classdomain match {
+  def buildDependencies = {
 
-    case None =>
+    //-- Invalidate compiler
+    this.buildInvalidateCompiler
 
-      //-- Invalidate compiler
-      this.buildInvalidateCompiler
+    //-- Build Dependencies
+    getMavenModel match {
+      case ESome(project) =>
 
-      //-- Build Dependencies
-      var result = getMavenModel match {
-        case ESome(project) =>
-          var deps = project.getDependencies.toList.map { dep => new DefaultArtifact(dep.getGroupId, dep.getArtifactId, "jar", dep.getVersion) }
-          (deps, deps.map { dep => AetherResolver.resolveArtifactsFile(dep) }.filter(_.isDefined).map { _.get.toURI().toURL() })
-        case other => (List(), List())
-      }
+        maven.resolveDependencies(project) match {
+          case ESome(deps) =>
 
-      dependencies = result._1
-      dependenciesURLS = result._2
+            
+            
+           /* var depsKey = config.get.getKey("dependencies", "files") match {
+              case Some(key) => key
+              case None => config.get.addKey("depdendencies", "files")
+            }
+            
+            depsKey.values.clear()*/
 
-      //-- Rebuild ClassDomain
-      //-----------
-      this.recreateClassDomain
+            deps.foreach {
+              dep =>
+                println("Collected: " + dep.getArtifact.getFile)
+               // depsKey.values.add.set(dep.getArtifact.getFile.getCanonicalPath)
+            }
+            
+            //-- Save dependencies
+            dependencies = deps
+            dependenciesURLS = deps.map {
+              dep => dep.getArtifact.getFile.toURI().toURL()
+            }
 
-      //-- Add Build output
-      this.classdomain.get.addURL(new File(this.path.toFile(), getMavenModel.get.getBuild.getOutputDirectory).toURI().toURL())
+            //-- Update classdomain
+            recreateClassDomain
 
-      //-- Update Dependencies
-      getDependenciesURL.foreach(this.classdomain.get.addURL(_))
+          case EError(err) =>
+            println("Resolution error:")
+            err.printStackTrace()
+            throw err
+          case other =>
+            println("Resolution other: " + other)
+        }
+
+      /*var deps = project.getDependencies.toList.map { dep => new DefaultArtifact(dep.getGroupId, dep.getArtifactId, "jar", dep.getVersion) }
+
+        project.getArtifacts.toList.foreach {
+          dep =>
+            println("Detected dependency: "+dep+" -> ")
+        }*/
+      /*project.getDependencies.toList.foreach {
+          dep =>
+            println("Detected dependency: "+dep+" -> ")
+        }*/
+
+      //(deps, deps.map { dep => AetherResolver.resolveArtifactsFile(dep) }.filter(_.isDefined).map { _.get.toURI().toURL() })
+      case other =>
+      //(List(), List())
+    }
+
+    println("Done deps")
+    /*dependencies = result._1
+    dependenciesURLS = result._2
+
+    dependenciesURLS.foreach {
+      url =>
+        println("Created dependency: " + url)
+    }*/
+
+    //-- Rebuild ClassDomain
+    //-----------
+    //this.recreateClassDomain
+
+    //-- Add Build output
+    //this.classdomain.get.addURL(new File(this.path.toFile(), getMavenModel.get.getBuild.getOutputDirectory).toURI().toURL())
+
+    //-- Update Dependencies
+    //getDependenciesURL.foreach(this.classdomain.get.addURL(_))
 
     /*dependencies = None
     dependenciesURLS = None
@@ -376,7 +627,6 @@ class MavenProjectResource(p: Path) extends BuildableProjectFolder(p) with Class
 
     du.foreach(this.classdomain.get.addURL(_))*/
 
-    case Some(_) =>
   }
 
   // Compiler Request
@@ -387,7 +637,7 @@ class MavenProjectResource(p: Path) extends BuildableProjectFolder(p) with Class
       c => c.clean
     }
     this.liveCompilers = List[LiveCompiler]()
-    
+
   }
 
   def buildLiveCompilers = {
@@ -405,13 +655,12 @@ class MavenProjectResource(p: Path) extends BuildableProjectFolder(p) with Class
                 this.addLiveCompiler(c)
 
               // Ooxoo Plugin
-              case plugin if (plugin.getArtifactId == "maven-ooxoo-plugin") => 
+              case plugin if (plugin.getArtifactId == "maven-ooxoo-plugin") =>
                 var c = new OOXOOLiveCompiler(this)
                 this.addLiveCompiler(c)
-                
-                
-              case other => 
-                
+
+              case other =>
+
             }
 
           case EError(err) =>

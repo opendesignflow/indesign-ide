@@ -14,6 +14,9 @@ import org.odfi.indesign.ide.module.scala.ScalaSourceFile
 
 class OOXOOLiveCompiler(project: MavenProjectResource) extends MavenConfiguredLiveCompiler(project) {
 
+   override def getDisplayName = "OOXOO Model Builder"
+  
+  
   var compiler: Option[IDCompiler] = None
 
   var outputBaseFile = new File(new File(project.getMavenModel.get.getBuild.getOutputDirectory).getParentFile, "generated-sources").getCanonicalFile

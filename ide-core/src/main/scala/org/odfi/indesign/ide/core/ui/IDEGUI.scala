@@ -16,9 +16,10 @@ import org.odfi.indesign.core.harvest.Harvest
 import org.odfi.indesign.ide.core.module.agent.ui.AgentUI
 import org.odfi.wsb.fwapp.assets.generator.AssetsGenerator
 import org.odfi.indesign.core.harvest.HarvestedResource
+import org.odfi.indesign.core.brain.ExternalBrainRegion
 
 trait IDEGUI extends HarvestedResource {
-  
+
 }
 object IDEGUI extends Site("/ide") with IDEGUI {
 
@@ -34,58 +35,76 @@ object IDEGUI extends Site("/ide") with IDEGUI {
       view(classOf[PluginsListView])
 
       //-- Populate brain regions which have some views
-      withCurrentIntermediary {
-        pluginsIntermdiary =>
+      "/imported" is {
+        withCurrentIntermediary {
+          pluginsIntermdiary =>
 
-          //-- Clear all intermediaries of 
-          pluginsIntermdiary.intermediaries.clear()
-
-          Harvest.onHarvestDone {
             //-- Clear all intermediaries of 
             pluginsIntermdiary.intermediaries.clear()
-            Brain.walkResourcesOfType[BrainRegion] {
-              region =>
-                println("Walked found region: " + region)
-                region.getDerivedResources[IDEBaseView].foreach {
-                  pluginView =>
 
-                    onIntermediary(pluginsIntermdiary) {
+            Harvest.onHarvestDone {
+              
+              //-- Clear all intermediaries of 
+              pluginsIntermdiary.intermediaries.clear()
+              
+              //-- Go Through All brain regions
+              //--------
+              
+              Brain.walkResourcesOfType[BrainRegion] {
+                
+                //-- If a region is a Site, just add
+                case siteRegion : Site if(siteRegion!=IDEGUI) => 
+                  
+                  logInfo[IDEGUI]("Walked found Site Region: " + siteRegion+" adding to :"+pluginsIntermdiary.fullURLPath)
+                  pluginsIntermdiary <= siteRegion
+                
+                case region =>
+                  logInfo[IDEGUI]("Walked found region: " + region)
+                  region.getDerivedResources[IDEBaseView].foreach {
+                    pluginView =>
 
-                      s"/${region.getDisplayName}/${pluginView.getDisplayName}" view (pluginView.getClass)
+                      onIntermediary(pluginsIntermdiary) {
 
-                    }
+                        s"/${region.getDisplayName}/${pluginView.getDisplayName}" view (pluginView.getClass)
 
-                    println(s"Found view: ${region.getDisplayName} -> " + pluginView.getDisplayName)
-                }
+                      }
+
+                      logInfo[IDEGUI](s"Found view: ${region.getDisplayName} -> " + pluginView.getDisplayName)
+                  }
+              }
+              
+              
             }
-          }
+        }
       }
 
     }
+
+  
 
     "/agent" view (classOf[AgentUI])
 
     // Assets
     //----------------------
-    println(s"Adding assets resolver")
-    val assetsResolver =  new AssetsResolver
-    ("/assets" uses assetsResolver)
+    //println(s"Adding assets resolver")
+    val assetsResolver = ("/assets" uses new AssetsResolver)
+
     assetsResolver is {
 
       "/generator" uses new AssetsGenerator
 
     }
-    assetsResolver <= new ResourcesAssetSource("/")
+    // assetsResolver <= new ResourcesAssetSource("/")
 
     println("Assets resolver:" + assetsResolver.fwappIntermediary.intermediaries.size)
 
     //-- Indesign
-    assetsResolver.addAssetsSource("/indesign-ide",new ResourcesAssetSource).addFilesSource("indesign-ide")
-    
+    assetsResolver.addAssetsSource("/indesign-ide", new ResourcesAssetSource).addFilesSource("indesign-ide")
+
     //AssetsManager.addAssetsSource("indesign-ide", new ResourcesAssetSource("/")).addFilesSource("indesign-ide")
 
     //-- Semantic
-    assetsResolver.addAssetsSource("/semantic",new ResourcesAssetSource).addFilesSource("indesign-ide/Semantic-UI-CSS-master")
+    assetsResolver.addAssetsSource("/semantic", new ResourcesAssetSource).addFilesSource("indesign-ide/external/Semantic-UI-CSS-master")
     //AssetsManager.addAssetsSource("semantic", new ResourcesAssetSource("/")).addFilesSource("indesign-ide/Semantic-UI-CSS-master")
 
   }

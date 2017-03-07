@@ -9,6 +9,7 @@ import org.odfi.indesign.core.brain.Brain
 import java.io.File
 import org.odfi.indesign.ide.core.project.ProjectsHarvester
 import org.odfi.indesign.ide.module.maven.MavenProjectHarvester
+import org.odfi.indesign.core.harvest.fs.HarvestedFile
 
 class MavenProjectBuildTest extends FunSuite {
   
@@ -22,8 +23,8 @@ class MavenProjectBuildTest extends FunSuite {
     
     // Create Projects
     //-------------
-     var topProject = new MavenProjectResource(new File("src/test/testFS/maven-app-dep/").toPath())
-    var dependendProject = new MavenProjectResource(new File("src/test/testFS/maven-app-internaldep/").toPath())
+     var topProject = new MavenProjectResource(new HarvestedFile(new File("src/test/testFS/maven-app-dep/").toPath()))
+    var dependendProject = new MavenProjectResource(new HarvestedFile(new File("src/test/testFS/maven-app-internaldep/").toPath()))
     
     MavenProjectHarvester.gatherPermanent(topProject)
     MavenProjectHarvester.gatherPermanent(dependendProject)
