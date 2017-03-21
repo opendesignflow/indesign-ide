@@ -45,10 +45,15 @@ trait BuildableProject extends Project with BrainLifecycle {
    */
   def buildFully
   
+  
+  
   /**
    * "Daily life" build
    */
   def buildStandard
+  def runBuildStard = this.runSingleTask("build.standard") {
+    buildStandard
+  }
   
   // Build Watch interface
   //-----------------
