@@ -8,6 +8,10 @@ trait SourceFile extends HarvestedFile {
   
 }
 
+trait SourceContent {
+  
+}
+
 trait JavaSourceFile extends SourceFile {
   
   def ensureCompiled

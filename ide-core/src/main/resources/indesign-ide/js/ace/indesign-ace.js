@@ -19,7 +19,7 @@ indesign.ide.editor.impl = {
 			console.log("Found Editor Element");
 			var editor = ace.edit(editorElement);
 			//var editor = ace.edit("ace-editor");
-			editor.setTheme("ace/theme/twillight");
+			editor.setTheme("ace/theme/solarized_light");
 		    editor.getSession().setMode("ace/mode/"+$(editorElement).data("language"));
 		    /*editor.resize();*/
 		    $(editorElement).height(editor.session.getLength()*15);
