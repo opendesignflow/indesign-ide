@@ -2,7 +2,7 @@ package org.odfi.indesign.ide.core.ui.editor
 
 import org.odfi.wsb.fwapp.framework.FWAppFrameworkView
 import org.odfi.indesign.ide.core.ui.lib.IndesignIDELibView
-import org.odfi.indesign.ide.core.sources.SourceFile
+
 
 trait EditorView extends IndesignIDELibView {
 
@@ -18,8 +18,8 @@ trait EditorView extends IndesignIDELibView {
 
   }
   
-  def languageEditor(language:String,source:SourceFile) = {
+  /*def languageEditor(language:String,source:SourceFile) = {
     
-  }
+  }*/
 
 }

@@ -11,9 +11,8 @@ import org.apache.lucene.document.TextField
 import org.apache.lucene.document.Field
 
 import org.odfi.indesign.core.harvest.fs.HarvestedTextFile
-import org.odfi.indesign.ide.core.sources.JavaSourceFile
 
-class ScalaSourceFile(r: Path) extends HarvestedTextFile(r) with LuceneIndexable with JavaSourceFile {
+class ScalaSourceFile(r: Path) extends HarvestedTextFile(r) with LuceneIndexable  {
 
   
   /*
@@ -113,11 +112,7 @@ class ScalaSourceFile(r: Path) extends HarvestedTextFile(r) with LuceneIndexable
 
   // Events
   //-----------------
-  override def onChange(cl: => Unit): Unit = {
-
-    //getUpchainCompilingProject.watcher.onFileChange(r.toFile())(cl)
-
-  }
+  
 
   // Indexsing
   //---------------

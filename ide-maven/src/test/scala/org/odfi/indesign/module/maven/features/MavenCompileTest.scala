@@ -13,7 +13,6 @@ import org.odfi.indesign.ide.module.scala.ScalaProjectHarvester
 import org.odfi.indesign.core.harvest.Harvest
 import org.odfi.indesign.core.brain.Brain
 import org.odfi.indesign.core.harvest.fs.FileSystemHarvester
-import org.odfi.indesign.ide.core.sources.SourceFile
 import org.odfi.indesign.ide.module.scala.ScalaSourceFile
 import org.odfi.indesign.core.harvest.fs.HarvestedFile
 
