@@ -18,7 +18,7 @@ trait LocalGUIExtensionsView extends IndesignIDELibView {
   def selectFileOfTypeButton(text: String,extension:(String,String))(cl: File => Any) = {
     "ui button" :: button(text) {
       onClick {
-        JFXRun.onJavaFX {
+        JFXRun.onJavaFXBlock {
           
           var stage = new Stage()
           var fileChooser = new FileChooser();
@@ -27,8 +27,8 @@ trait LocalGUIExtensionsView extends IndesignIDELibView {
           
          
           stage.setAlwaysOnTop(true)
-          //stage.show()
-          //stage.setFocused(true)
+          stage.show()
+          
 
           fileChooser.showOpenDialog(stage) match {
             case null =>
@@ -37,6 +37,8 @@ trait LocalGUIExtensionsView extends IndesignIDELibView {
               cl(folder)
 
           }
+          stage.close()
+          println(s"Finished JFX Block")
         }
       }
     }
