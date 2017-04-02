@@ -1,22 +1,24 @@
-package org.odfi.indesign.ide.core.ui
+package org.odfi.indesign.ide.www
 
 import org.odfi.wsb.fwapp.Site
-import org.odfi.wsb.fwapp.assets.AssetsManager
 import org.odfi.indesign.core.brain.Brain
 import org.odfi.indesign.ide.core.ui.projects.ProjectsListView
-import org.odfi.indesign.ide.core.ui.plugins.PluginsListView
-import org.odfi.indesign.ide.core.ui.main.IDEBaseView
-import org.odfi.indesign.ide.core.ui.main.WelcomeIDEView
+import org.odfi.indesign.ide.www.plugins.PluginsListView
+import org.odfi.indesign.ide.www.welcome.WelcomeIDEView
 import org.odfi.indesign.core.brain.BrainRegion
 import org.odfi.wsb.fwapp.assets.AssetsResolver
 import org.odfi.indesign.ide.core.services.stash.StashTree
-import org.odfi.indesign.ide.core.ui.main.FSConfigView
+import org.odfi.indesign.ide.www.filesystem.FSConfigView
 import org.odfi.wsb.fwapp.assets.ResourcesAssetSource
 import org.odfi.indesign.core.harvest.Harvest
 import org.odfi.indesign.ide.core.module.agent.ui.AgentUI
 import org.odfi.wsb.fwapp.assets.generator.AssetsGenerator
 import org.odfi.indesign.core.harvest.HarvestedResource
-import org.odfi.indesign.core.brain.ExternalBrainRegion
+import org.odfi.indesign.ide.core.module.agent.ui.AgentUI
+import org.odfi.indesign.ide.www.filesystem.FSConfigView
+import org.odfi.indesign.ide.www.plugins.PluginsListView
+import org.odfi.indesign.ide.core.ui.projects.ProjectsListView
+import org.odfi.indesign.ide.www.welcome.WelcomeIDEView
 
 trait IDEGUI extends HarvestedResource {
 

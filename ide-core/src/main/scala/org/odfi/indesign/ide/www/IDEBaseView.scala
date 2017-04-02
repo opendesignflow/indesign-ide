@@ -1,25 +1,19 @@
-package org.odfi.indesign.ide.core.ui.main
+package org.odfi.indesign.ide.www
 
 import java.awt.GraphicsEnvironment
-
-import org.odfi.indesign.ide.core.IndesignIDE
-import org.odfi.wsb.fwapp.framework.FWAppValueBindingView
 import org.odfi.wsb.fwapp.module.datatables.DataTablesView
 import org.odfi.wsb.fwapp.module.jquery.JQueryTreetable
 import org.odfi.wsb.fwapp.module.semantic.SemanticView
 import org.odfi.wsb.fwapp.views.ui.SemanticUIImplView
 import org.w3c.dom.html.HTMLElement
-
 import com.idyria.osi.vui.html.HTMLNode
 import org.odfi.wsb.fwapp.FWappIntermediary
 import org.odfi.indesign.ide.core.ui.IndesignFrameworkView
 import org.odfi.indesign.core.harvest.Harvest
 import org.odfi.indesign.core.config.Config
-import org.odfi.indesign.ide.core.ui.IDEGUI
 import org.odfi.wsb.fwapp.framework.FWAppTempBufferView
 import org.odfi.wsb.fwapp.framework.FWAppValueBufferView
 import org.odfi.wsb.fwapp.Site
-import org.odfi.indesign.core.brain.Brain
 import org.odfi.indesign.ide.core.ui.contrib.IDEGUIMenuProvider
 import org.odfi.wsb.fwapp.assets.ResourcesAssetSource
 import org.odfi.indesign.core.main.IndesignPlatorm

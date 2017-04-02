@@ -19,7 +19,7 @@ import org.odfi.indesign.ide.module.maven.embedder.EmbeddedMaven
 import org.apache.maven.project.MavenProject
 import org.odfi.indesign.ide.core.project.ProjectModule
 import org.odfi.indesign.core.harvest.fs.FileSystemHarvester
-import org.odfi.indesign.ide.module.maven.ui.MavenGUI
+import org.odfi.indesign.ide.module.maven.www.MavenGUI
 import org.odfi.indesign.core.artifactresolver.AetherResolver
 import org.odfi.indesign.ide.module.maven.resolver.MavenProjectWorkspaceReader
 

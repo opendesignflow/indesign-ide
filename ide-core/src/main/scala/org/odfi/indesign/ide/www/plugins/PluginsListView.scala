@@ -1,20 +1,17 @@
-package org.odfi.indesign.ide.core.ui.plugins
+package org.odfi.indesign.ide.www.plugins
 
-import org.odfi.indesign.ide.core.ui.main.IDEBaseView
+import org.odfi.indesign.ide.www.IDEBaseView
 import org.odfi.indesign.core.brain.Brain
 import org.odfi.indesign.core.brain.ExternalBrainRegion
 import org.odfi.indesign.core.harvest.Harvest
-import org.odfi.indesign.ide.core.module.eclipse.EclipseWorkspaceHarvester
-import javax.swing.JFileChooser
-import javax.swing.JFrame
 import org.odfi.indesign.core.module.jfx.JFXRun
 import javafx.stage.Stage
-import javafx.stage.FileChooser
 import javafx.stage.DirectoryChooser
 import org.odfi.indesign.core.brain.BrainRegion
 import org.odfi.indesign.core.harvest.Harvester
 import org.odfi.indesign.core.brain.RegionClassName
 import org.odfi.indesign.ide.core.ui.utils.ErrorsHelpView
+import org.odfi.indesign.core.brain.ExternalBrainRegion
 
 class PluginsListView extends IDEBaseView with ErrorsHelpView {
 

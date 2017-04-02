@@ -1,8 +1,9 @@
-package org.odfi.indesign.ide.core.ui.main
+package org.odfi.indesign.ide.www.filesystem
 
 import org.odfi.indesign.core.harvest.fs.FileSystemHarvester
 import org.odfi.indesign.core.harvest.fs.HarvestedFile
 import org.odfi.indesign.ide.core.ui.utils.LocalGUIExtensionsView
+import org.odfi.indesign.ide.www.IDEBaseView
 
 class FSConfigView extends IDEBaseView with LocalGUIExtensionsView {
 

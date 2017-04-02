@@ -1,11 +1,11 @@
-package org.odfi.indesign.ide.module.maven
+package org.odfi.indesign.ide.module.maven.www
 
-import com.idyria.osi.wsb.webapp.localweb.LocalWebEngine
-import com.idyria.osi.wsb.webapp.localweb.LocalWebHTMLVIew
 import org.odfi.indesign.ide.module.scala.ScalaAppSourceFile
 import org.odfi.indesign.ide.module.scala.ScalaAppHarvester
 import org.odfi.indesign.core.harvest.Harvest
-import org.odfi.indesign.ide.core.ui.main.IDEBaseView
+import org.odfi.indesign.ide.www.IDEBaseView
+import org.odfi.indesign.ide.module.maven.MavenProjectResource
+
 
 class MavenWWWView (val mavenProject: MavenProjectResource) extends IDEBaseView {
 

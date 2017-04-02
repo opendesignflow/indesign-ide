@@ -1,6 +1,6 @@
 package org.odfi.indesign.ide.core.module.intelliJ
 
-import org.odfi.indesign.ide.core.ui.main.IDEBaseView
+import org.odfi.indesign.ide.www.IDEBaseView
 
 class IntelliJOverview extends IDEBaseView {
 

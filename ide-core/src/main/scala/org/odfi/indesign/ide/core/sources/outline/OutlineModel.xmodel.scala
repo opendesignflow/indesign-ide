@@ -20,6 +20,7 @@ object OutlineModel extends ModelBuilder {
     isTrait
     "Name" ofType ("string")
     "Description" ofType ("cdata")
+    "UpdateTime" ofType ("datetime")
   }
 
   "Outline" is {
@@ -28,22 +29,31 @@ object OutlineModel extends ModelBuilder {
     withTrait(classOf[JSonUtilTrait])
     withTrait(namedAndDescriptions)
 
-    "OutlineSection" multiple {
+    "View" multiple {
       withTrait(namedAndDescriptions)
-    }
+      "ViewClass" ofType ("string")
+      "ViewName" ofType ("string")
 
-    "OutlineElement" multiple {
-
-      withTrait(namedAndDescriptions)
-
-      "Type" ofType ("string")
-
-      "Hint" multiple {
-        ofType("string")
+      "OutlineSection" multiple {
         withTrait(namedAndDescriptions)
-        "Value" ofType("string")
+
+        "OutlineElement" multiple {
+
+          withTrait(namedAndDescriptions)
+
+          "Type" ofType ("string")
+
+          "Hint" multiple {
+            ofType("string")
+            withTrait(namedAndDescriptions)
+            "Value" ofType ("string")
+
+          }
+        }
 
       }
+
     }
+
   }
 }

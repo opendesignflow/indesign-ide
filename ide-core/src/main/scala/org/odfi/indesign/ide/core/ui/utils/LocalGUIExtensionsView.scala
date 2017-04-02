@@ -26,7 +26,7 @@ trait LocalGUIExtensionsView extends IndesignIDELibView {
           fileChooser.setSelectedExtensionFilter(new ExtensionFilter(extension._1,extension._2))
           
          
-          stage.setAlwaysOnTop(true)
+          //stage.setAlwaysOnTop(true)
           stage.show()
           
 
@@ -48,15 +48,15 @@ trait LocalGUIExtensionsView extends IndesignIDELibView {
   def selectDirectoryButton(text: String)(cl: File => Any) = {
     "ui button" :: button(text) {
       onClick {
-        JFXRun.onJavaFX {
+        JFXRun.onJavaFXBlock {
           
           var stage = new Stage()
           var dirChooser = new DirectoryChooser();
           dirChooser.setTitle("Select Compilation Output Folder for a region");
           
          
-          stage.setAlwaysOnTop(true)
-          //stage.show()
+          //stage.setAlwaysOnTop(true)
+          stage.show()
           //stage.setFocused(true)
           
           dirChooser.showDialog(stage) match {

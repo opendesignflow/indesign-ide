@@ -9,13 +9,14 @@ import org.odfi.indesign.ide.module.maven.region.MavenExternalBrainRegion
 import org.odfi.indesign.ide.module.maven.MavenModule
 import com.idyria.osi.tea.compile.ClassDomainContainer
 import org.odfi.indesign.core.brain.artifact.ArtifactRegion
-import org.odfi.indesign.ide.core.ui.main.IDEBaseView
+
 import org.odfi.wsb.fwapp.module.jquery.JQueryTreetable
 import org.odfi.indesign.ide.core.ui.tasks.TasksView
 import org.odfi.indesign.ide.core.ui.utils.ErrorsHelpView
 import org.odfi.indesign.ide.module.scala.ScalaProjectHarvester
 import org.odfi.indesign.ide.module.scala.ScalaAppHarvester
 import org.odfi.indesign.ide.module.scala.ScalaAppSourceFile
+import org.odfi.indesign.ide.www.IDEBaseView
 
 class MavenOverview extends IDEBaseView with JQueryTreetable with TasksView with ErrorsHelpView {
 

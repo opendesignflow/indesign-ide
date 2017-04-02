@@ -1,6 +1,6 @@
 package org.odfi.indesign.ide.core.module.agent.ui
 
-import org.odfi.indesign.ide.core.ui.main.IDEBaseView
+import org.odfi.indesign.ide.www.IDEBaseView
 import javax.swing.JFileChooser
 import javax.swing.JFrame
 import org.odfi.indesign.ide.core.module.eclipse.EclipseWorkspaceHarvester

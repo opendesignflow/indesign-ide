@@ -1,6 +1,6 @@
 package org.odfi.indesign.ide.core.ui.projects
 
-import org.odfi.indesign.ide.core.ui.main.IDEBaseView
+import org.odfi.indesign.ide.www.IDEBaseView
 
 class ProjectsListView extends IDEBaseView {
   

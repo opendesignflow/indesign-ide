@@ -10,7 +10,7 @@ import org.odfi.indesign.core.main.IndesignPlatorm
 import org.odfi.indesign.ide.core.module.agent.AgentModule
 import org.odfi.indesign.ide.core.module.intelliJ.IntelliJModule
 import org.odfi.indesign.ide.core.project.ProjectsHarvester
-import org.odfi.indesign.ide.core.ui.IDEGUI
+import org.odfi.indesign.ide.www.IDEGUI
 import org.odfi.wsb.fwapp.FWappTreeBuilder
 import com.idyria.osi.tea.files.FileWatcherAdvanced
 import org.odfi.wsb.fwapp.FWappIntermediary

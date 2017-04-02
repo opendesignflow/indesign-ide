@@ -1,4 +1,6 @@
-package org.odfi.indesign.ide.core.ui.main
+package org.odfi.indesign.ide.www.welcome
+
+import org.odfi.indesign.ide.www.IDEBaseView
 
 class WelcomeIDEView extends IDEBaseView {
    

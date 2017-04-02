@@ -11,8 +11,9 @@ import org.apache.lucene.document.TextField
 import org.apache.lucene.document.Field
 
 import org.odfi.indesign.core.harvest.fs.HarvestedTextFile
+import org.odfi.indesign.ide.core.sources.SourceCodeFile
 
-class ScalaSourceFile(r: Path) extends HarvestedTextFile(r) with LuceneIndexable  {
+class ScalaSourceFile(r: Path) extends SourceCodeFile(r) with LuceneIndexable  {
 
   
   /*

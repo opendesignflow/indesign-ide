@@ -6,18 +6,18 @@ import org.odfi.indesign.core.resources.TextSourceResource
 import org.odfi.indesign.core.resources.FileTextSourceResource
 import org.odfi.indesign.core.resources.StringTextSourceResource
 
-trait CodeSource extends TextSourceResource {
+trait SourceCodeProvider extends TextSourceResource {
   
 }
 
-class SourceCodeFile(p:Path) extends FileTextSourceResource(p) with CodeSource {
+class SourceCodeFile(p:Path) extends FileTextSourceResource(p) with SourceCodeProvider {
   
 
   
 }
 
 //  with CodeSource 
-class SourceCodeStringContent(str:String) extends StringTextSourceResource(str) {
+class SourceCodeStringContent(str:String) extends StringTextSourceResource(str)  with SourceCodeProvider {
   
 }
 

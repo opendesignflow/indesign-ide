@@ -1,10 +1,9 @@
-package org.odfi.indesign.ide.module.scala.ui
+package org.odfi.indesign.ide.module.maven.www.scala
 
+import org.odfi.indesign.ide.www.IDEBaseView
 import org.odfi.indesign.core.harvest.Harvest
 import org.odfi.indesign.ide.module.scala.ScalaAppHarvester
-
 import org.odfi.indesign.ide.module.scala.ScalaAppSourceFile
-import org.odfi.indesign.ide.core.ui.main.IDEBaseView
 
 class ScalaOverview extends IDEBaseView {
 

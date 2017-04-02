@@ -8,7 +8,7 @@ import org.odfi.indesign.ide.module.maven.MavenProjectHarvester
 import org.odfi.indesign.core.module.IndesignModule
 import org.odfi.indesign.core.harvest.Harvester
 import org.odfi.indesign.core.harvest.fs.HarvestedFile
-import org.odfi.indesign.ide.module.scala.ui.ScalaOverview
+import org.odfi.indesign.ide.module.maven.www.scala.ScalaOverview
 
 object ScalaModule extends IndesignModule {
 

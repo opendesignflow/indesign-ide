@@ -1,6 +1,5 @@
-package org.odfi.indesign.ide.core.module.ace
+package org.odfi.indesign.ide.core.ui.editor.ace
 
-import org.odfi.wsb.fwapp.framework.FWAppFrameworkView
 import org.odfi.indesign.ide.core.ui.editor.EditorView
 
 trait ACEEditorView extends EditorView {
@@ -19,10 +18,10 @@ trait ACEEditorView extends EditorView {
         script(createAssetsResolverURI("indesign-ide/external/node/node_modules/ace-builds/src-min-noconflict/ace.js")) {
 
         }
-        script(createAssetsResolverURI("indesign-ide/js/ace/indesign-ace.js")) {
+        script(createAssetsResolverURI("indesign-ide/editor/ace/indesign-ace.js")) {
 
         }
-        stylesheet(createAssetsResolverURI("indesign-ide/js/ace/indesign-ace.css")) {
+        stylesheet(createAssetsResolverURI("indesign-ide/editor/ace/indesign-ace.css")) {
 
         }
       }

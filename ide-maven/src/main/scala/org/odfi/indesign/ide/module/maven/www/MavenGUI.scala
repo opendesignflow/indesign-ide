@@ -1,12 +1,12 @@
-package org.odfi.indesign.ide.module.maven.ui
+package org.odfi.indesign.ide.module.maven.www
 
-import org.odfi.wsb.fwapp.Site
 import org.odfi.indesign.ide.core.ui.IndesignSiteModule
-import org.odfi.indesign.core.harvest.Harvest
 import org.odfi.indesign.ide.module.maven.MavenProjectHarvester
 import org.odfi.indesign.ide.module.maven.MavenProjectResource
 import org.odfi.wsb.fwapp.assets.AssetsResolver
 import org.odfi.indesign.ide.core.ui.contrib.IDEGUIMenuProvider
+import org.odfi.indesign.ide.module.maven.ui.MavenOverview
+import org.odfi.indesign.ide.module.maven.ui.MavenProjectView
 
 object MavenGUI extends IndesignSiteModule("/maven") with IDEGUIMenuProvider {
  

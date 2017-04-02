@@ -1,13 +1,13 @@
 package org.odfi.indesign.ide.module.maven.ui
 
 import org.odfi.indesign.ide.module.maven.MavenProjectResource
-import org.odfi.indesign.ide.core.ui.main.IDEBaseView
 import org.odfi.wsb.fwapp.views.FWAppCatchAllView
 import org.odfi.indesign.ide.module.maven.MavenProjectHarvester
 import org.odfi.indesign.ide.module.scala.ScalaProjectHarvester
 import org.odfi.indesign.ide.module.scala.ScalaAppHarvester
 import org.odfi.indesign.ide.module.scala.ScalaAppSourceFile
 import org.odfi.indesign.ide.core.ui.utils.ErrorsHelpView
+import org.odfi.indesign.ide.www.IDEBaseView
 
 class MavenProjectView extends IDEBaseView with FWAppCatchAllView with ErrorsHelpView {
 
