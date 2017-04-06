@@ -10,6 +10,11 @@ import org.eclipse.aether.artifact.DefaultArtifact
 @xelement(name = "project")
 class project extends projectTrait {
 
+  def isSnapshot = getVersion match {
+    case v if(v!=null && v.contains("SNAPSHOT")) => true 
+    case other => false
+  }
+  
   def getArtifactId: String = {
     this.artifactId match {
       case null =>
