@@ -631,15 +631,6 @@ class MavenProjectResource(p: HarvestedFile) extends BuildableProjectFolder(p.pa
 
   // Compiler Request
   //--------------------
-  def buildInvalidateLiveCompilers = {
-
-    this.liveCompilers.foreach {
-      c => c.clean
-    }
-    this.liveCompilers = List[LiveCompiler]()
-
-  }
-
   def buildLiveCompilers = {
 
     this.liveCompilers.size match {

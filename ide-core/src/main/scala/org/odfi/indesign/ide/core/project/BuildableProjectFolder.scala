@@ -41,9 +41,7 @@ class DefaultBuildableProjectFolder(p:Path) extends BuildableProjectFolder(p) {
   def buildInvalidateDependencies: Unit ={
     
   }
-  def buildInvalidateLiveCompilers: Unit = {
-    
-  }
+ 
   def buildLiveCompilers: Unit = {
     
   }
