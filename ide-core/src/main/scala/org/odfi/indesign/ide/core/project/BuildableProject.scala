@@ -76,7 +76,14 @@ trait BuildableProject extends Project with BrainLifecycle {
   
   var liveCompilers = List[LiveCompiler]()
   
-  def addLiveCompiler[T <: LiveCompiler](lc:T) =  this.liveCompilers = this.liveCompilers :+ lc
+  /**
+   * Add live compiler and move to start
+   */
+  def addLiveCompiler[T <: LiveCompiler](lc:T) =   {
+    this.liveCompilers = this.liveCompilers :+ lc
+    lc.moveToStart
+    lc
+  }
   
   def getLiveCompiler[T<:LiveCompiler](implicit tag : ClassTag[T]) = {
     this.liveCompilers.find (lc => tag.runtimeClass.isInstance(lc))
