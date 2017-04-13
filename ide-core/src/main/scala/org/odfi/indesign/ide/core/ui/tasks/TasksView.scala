@@ -6,8 +6,9 @@ import org.odfi.indesign.core.heart.HeartTask
 import org.odfi.wsb.fwapp.framework.FWAppFrameworkView
 import org.odfi.indesign.ide.core.ui.utils.ErrorsHelpView
 import org.odfi.indesign.core.harvest.HarvestedResource
+import org.odfi.indesign.ide.core.ui.lib.IndesignIDELibView
 
-trait TasksView extends FWAppFrameworkView with ErrorsHelpView {
+trait TasksView extends IndesignIDELibView with ErrorsHelpView {
 
   this.addLibrary("indesign-ide") {
     case (_, target) =>
@@ -59,7 +60,7 @@ trait TasksView extends FWAppFrameworkView with ErrorsHelpView {
       case other =>
 
         //-- Create Button
-        "ui button" :: button("") {
+        val resb = "ui button" :: button("") {
 
           "settings icon" :: i {
 
@@ -97,23 +98,9 @@ trait TasksView extends FWAppFrameworkView with ErrorsHelpView {
             }
           case None =>
         }
+        
+        resb
     }
 
-    //-- Create Wrapper
-    /*var taskButton = new HeartTaskButton(hButton, task)
-
-    // Now setup run
-    switchToNode(hButton, {
-
-      //-- Get an Action String
-      var actionString = getActionString {
-        taskButton.submitTask
-      }
-
-      +@("onclick" -> s"indesign.heart.launchTask(this,'${taskButton.submitTask}')")
-
-    })
-
-    taskButton*/
   }
 }
