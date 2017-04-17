@@ -107,7 +107,7 @@ class DebianRepository(val repositoryPath: File) extends Site("/debian") {
       case arch => 
         targetDistFolder.createSubFile("binary-"+arch)
     }
-    val targetDistArchFolder = targetDistFolder.createSubFile("binary-"+changes.getArchitecture)
+   // val targetDistArchFolder = targetDistFolder.createSubFile("binary-"+changes.getArchitecture)
 
   }
 
