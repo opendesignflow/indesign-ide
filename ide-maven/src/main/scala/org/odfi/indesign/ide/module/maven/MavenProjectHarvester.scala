@@ -8,6 +8,7 @@ import org.odfi.indesign.core.harvest.Harvest
 import org.odfi.indesign.ide.core.project.ProjectHarvesterTrait
 import org.odfi.indesign.ide.module.maven.resolver.MavenProjectWorkspaceReader
 import org.odfi.indesign.core.artifactresolver.AetherResolver
+import org.apache.maven.project.MavenProject
 
 object MavenProjectHarvester extends FileSystemHarvester with LuceneIndexProvider with ProjectHarvesterTrait {
  
@@ -75,6 +76,17 @@ object MavenProjectHarvester extends FileSystemHarvester with LuceneIndexProvide
     AetherResolver.session.setWorkspaceReader(null)
   }
   
+  // Utils
+  //--------------
+  def getMavenProjectAtLocation(fileStr:String) :Option[MavenProjectResource] = getMavenProjectAtLocation(new File(fileStr))
+  
+  def getMavenProjectAtLocation(file:File) :Option[MavenProjectResource]= {
+    
+    this.getResourcesOfType[MavenProjectResource].find {
+      mp => mp.sameAs(file)
+    }
+    
+  }
   
 
   //Harvest.updateAutoHarvesterOn(this)
