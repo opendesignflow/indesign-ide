@@ -100,12 +100,12 @@ class DebianRepository(val repositoryPath: File) extends Site("/debian") {
 
     // Publish
     //-----------------
-    val targetDistFolder = distsPath.createSubFile(changes.getDistribution)
+    val targetDistFolder = distsPath.createSubFolder(changes.getDistribution)
     changes.getArchitectures.foreach {
       case "source" => 
-        targetDistFolder.createSubFile("source")
+        targetDistFolder.createSubFolder("source")
       case arch => 
-        targetDistFolder.createSubFile("binary-"+arch)
+        targetDistFolder.createSubFolder("binary-"+arch)
     }
    // val targetDistArchFolder = targetDistFolder.createSubFile("binary-"+changes.getArchitecture)
 
