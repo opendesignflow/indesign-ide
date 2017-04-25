@@ -68,6 +68,7 @@ trait BuildableProject extends Project with BrainLifecycle {
   def buildInvalidateLiveCompilers = {
     this.liveCompilers.foreach {
       lc => 
+        lc.moveToShutdown
         lc.clean
     }
     this.liveCompilers =  List[LiveCompiler]()

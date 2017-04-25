@@ -9,6 +9,14 @@ trait LiveCompiler extends HarvestedResource with BrainLifecycle   {
   def getId = getClass.getCanonicalName+"@"+hashCode()
 
   
+  // Environment
+  //----------------
+  var lcEnvironment = Map[String,String]()
+  
+  def putEnvironment(name:String,value:String) = {
+    this.lcEnvironment = this.lcEnvironment + (name -> value)
+  }
+  
   // LFC
   //-----------
    this.onClean {
