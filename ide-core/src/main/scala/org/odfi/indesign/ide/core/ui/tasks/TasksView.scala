@@ -43,9 +43,9 @@ trait TasksView extends IndesignIDELibView with ErrorsHelpView {
 
         //-- Create Button
 
-        "ui button" :: button("") {
+        "ui labeled icon button" :: button("") {
 
-          "stop circle outline icon" :: i {
+          "stop  icon" :: i {
 
           }
           +@("title" -> "Stop task")
@@ -60,9 +60,9 @@ trait TasksView extends IndesignIDELibView with ErrorsHelpView {
       case other =>
 
         //-- Create Button
-        val resb = "ui button" :: button("") {
+        val resb = "ui labeled icon button" :: button("") {
 
-          "play circle outline icon" :: i {
+          "play  icon" :: i {
 
           }
 
