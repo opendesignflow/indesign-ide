@@ -45,15 +45,15 @@ trait TasksView extends IndesignIDELibView with ErrorsHelpView {
 
         "ui button" :: button("") {
 
-          "settings icon" :: i {
+          "stop circle outline icon" :: i {
 
           }
-
+          +@("title" -> "Stop task")
           text(stopName)
-          /*onClickReload {
+          onClickReload {
             
             Heart.killTask(t)
-          }*/
+          }
 
         }
 
@@ -62,7 +62,7 @@ trait TasksView extends IndesignIDELibView with ErrorsHelpView {
         //-- Create Button
         val resb = "ui button" :: button("") {
 
-          "settings icon" :: i {
+          "play circle outline icon" :: i {
 
           }
 
