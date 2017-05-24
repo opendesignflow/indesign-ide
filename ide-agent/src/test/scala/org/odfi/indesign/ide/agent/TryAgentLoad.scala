@@ -1,5 +1,5 @@
 package org.odfi.indesign.ide.agent
-
+/*
 import java.lang.management.ManagementFactory
 import com.sun.tools.attach.VirtualMachine
 import java.io.File
@@ -45,4 +45,4 @@ object TryAgentLoad extends App {
     
   
 
-}
+}*/

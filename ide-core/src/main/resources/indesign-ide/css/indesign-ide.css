@@ -1,0 +1,16 @@
+body {
+	margin: 20px;
+	margin-left: 40px;
+}
+
+#header {
+	margin-bottom: 10px;
+}
+
+#page {
+	margin-top:10px;
+}
+
+.ribbon-header a.ui.ribbon.label {
+	margin-bottom: 10px;
+}

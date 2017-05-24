@@ -2,10 +2,11 @@ package org.odfi.indesign.ide.agent.reload
 
 import java.lang.instrument.Instrumentation
 import java.io.File
-import com.idyria.osi.tea.files.FileWatcherAdvanced
+import imported.com.idyria.osi.tea.files.FileWatcherAdvanced
 import java.lang.instrument.ClassDefinition
-import com.idyria.osi.tea.io.TeaIOUtils
+import imported.com.idyria.osi.tea.io.TeaIOUtils 
 import java.io.FileInputStream
+import org.odfi.indesign.ide.agent.IndesignIDEAgent
 
 class IndesignClassReloader(val instrumentation: Instrumentation) {
 
@@ -16,7 +17,7 @@ class IndesignClassReloader(val instrumentation: Instrumentation) {
 
   def onChange(file: File) = {
     
-    println("Detected change on target class: "+file)
+    //println("Detected change on target class: "+file)
     
     //println("TocToc")
     file.getCanonicalPath match {
@@ -44,7 +45,12 @@ class IndesignClassReloader(val instrumentation: Instrumentation) {
             }
             } catch {
               case e : Throwable => 
+                
                 println(s"Error for: $className during name definition, ignoring...."+e.getLocalizedMessage)
+                
+                //-- Mark tainted
+                IndesignIDEAgent.restartRequired
+                
             }
 
           // Ignore
