@@ -13,9 +13,9 @@
 	</parent>
 
 	<properties>
-		<indesign.version>1.1.0</indesign.version>
-		<ooxoo.version>3.2.3</ooxoo.version>
-		<fwapp.version>1.0.0</fwapp.version>
+		<indesign.version>1.2.0-SNAPSHOT</indesign.version>
+		<ooxoo.version>3.3.0-SNAPSHOT</ooxoo.version>
+		<fwapp.version>1.1.0-SNAPSHOT</fwapp.version>
 	</properties>
 
 	<dependencyManagement>

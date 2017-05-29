@@ -82,13 +82,14 @@
 			<artifactId>indesign-core</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.odfi.wsb.fwapp</groupId>
+			<artifactId>fwapp-core</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>indesign-ide-agent</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.odfi.wsb.fwapp</groupId>
-			<artifactId>fwapp-core</artifactId>
-		</dependency>
+
 	</dependencies>
 </project>
