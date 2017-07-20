@@ -19,11 +19,13 @@ import org.odfi.indesign.ide.www.filesystem.FSConfigView
 import org.odfi.indesign.ide.www.plugins.PluginsListView
 import org.odfi.indesign.ide.core.ui.projects.ProjectsListView
 import org.odfi.indesign.ide.www.welcome.WelcomeIDEView
+import org.odfi.wsb.fwapp.jmx.FWAPPJMX
+import org.odfi.wsb.fwapp.swing.SwingPanelSite
 
 trait IDEGUI extends HarvestedResource {
 
 }
-object IDEGUI extends Site("/ide") with IDEGUI {
+object IDEGUI extends SwingPanelSite("/ide") with IDEGUI with FWAPPJMX  {
 
   //-- Site
   "/site" is {

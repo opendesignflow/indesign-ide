@@ -22,8 +22,9 @@ import org.odfi.indesign.core.harvest.fs.FileSystemHarvester
 import org.odfi.indesign.ide.module.maven.www.MavenGUI
 import org.odfi.indesign.core.artifactresolver.AetherResolver
 import org.odfi.indesign.ide.module.maven.resolver.MavenProjectWorkspaceReader
+import org.odfi.indesign.ide.core.plugins.IndesignIDEPlugin
 
-object MavenModule extends IndesignModule {
+object MavenModule extends IndesignIDEPlugin {
 
   override def getDisplayName = "Maven"
 

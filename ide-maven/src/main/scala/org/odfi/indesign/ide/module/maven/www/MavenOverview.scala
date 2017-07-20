@@ -90,7 +90,7 @@ class MavenOverview extends IDEBaseView with JQueryTreetable with TasksView with
                 
                 No Maven Projects Detected
                 
-                To Add a project, you could add a Source ${a("/ide/site/sources")(text("here"))}
+                To Add a project, you could add a Source ${a("@/site/sources")(text("here"))}
                 
                 """)
             case _ =>

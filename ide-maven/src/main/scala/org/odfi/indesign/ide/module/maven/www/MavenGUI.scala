@@ -15,10 +15,12 @@ object MavenGUI extends IndesignSiteModule("/maven") with IDEGUIMenuProvider {
   // Gui Providing
   //-------------------
   override def getMenuLinks= {
-    MavenProjectHarvester.getResourcesOfType[MavenProjectResource].map {
+    
+    val projects = MavenProjectHarvester.getResourcesOfType[MavenProjectResource].map {
       mp => 
       (mp.getDisplayName, s"/${MavenGUI.fullURLPath}/projects/${mp.getGroupId}/${mp.getArtifactId}/${mp.getVersion}")
-    }
+    }.toList
+     projects ::: List( ("Release Helper", s"//release/help") )
   }
   
   // Site
@@ -27,7 +29,14 @@ object MavenGUI extends IndesignSiteModule("/maven") with IDEGUIMenuProvider {
   
   "/assets" uses new AssetsResolver
   
-  "projects" is {  
+  "/release" is {
+    
+    "/help" is {
+      
+    }
+  }
+  
+  "/projects" is {  
     
     view(classOf[MavenProjectView])
     /*withCurrentIntermediary {

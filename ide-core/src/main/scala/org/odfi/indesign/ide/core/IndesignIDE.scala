@@ -64,9 +64,8 @@ object IndesignIDE extends App with FWappTreeBuilder {
   //---------------
 
   //-- Configuration
-  IndesignPlatorm use Config
   IndesignPlatorm use OOXOOConfigModule
-  OOXOOConfigModule.configFolder = new File("indesign-ide-config")
+  OOXOOConfigModule.setConfigFolder(new File("indesign-ide-config"))
   //Config.setImplementation(new OOXOOFSConfigImplementation(new File("indesign-ide-config")))
 
   //-- Projects and FS Harvester
@@ -79,7 +78,7 @@ object IndesignIDE extends App with FWappTreeBuilder {
   // Create FWapp Server
   //---------------
   IndesignPlatorm use IDEGUI
-  IDEGUI.listen(8400)
+  IDEGUI.listenWithJMXClose(8400)
 
   // Start
   //-------------
