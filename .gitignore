@@ -5,3 +5,4 @@
 *.classpath
 **/indesign-ide-config/*
 .*
+**/indesign-config/*
