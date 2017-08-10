@@ -82,6 +82,11 @@
 			<artifactId>indesign-core</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.odfi.indesign</groupId>
+			<artifactId>indesign-git</artifactId>
+			<version>${indesign.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.odfi.wsb.fwapp</groupId>
 			<artifactId>fwapp-core</artifactId>
 		</dependency>
