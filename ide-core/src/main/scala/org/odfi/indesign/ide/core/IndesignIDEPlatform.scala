@@ -19,7 +19,7 @@ object IndesignIDEPlatform extends IndesignModule {
 
     // Developement options
     //--------------
-    requireModule(AgentModule)
+    //requireModule(AgentModule)
 
     // Setup Indesign
     //---------------
@@ -37,7 +37,7 @@ object IndesignIDEPlatform extends IndesignModule {
     requireModule(IntelliJModule)
     
     // Load GUi
-    IndesignPlatorm use IDEGUI
+    requireModule(IDEGUI)
     IDEGUI.listenWithJMXClose(8400)
 
   }

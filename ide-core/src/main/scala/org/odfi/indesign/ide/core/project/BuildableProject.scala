@@ -13,6 +13,13 @@ trait BuildableProject extends Project with BrainLifecycle {
   // Dependencies
   //--------------------
   def getDependencies : List[Dependency]
+  
+  /**
+   * If the project supports sub projects, get dependencies accross them all
+   * Defaults to normal getDependencies
+   */
+  def getDependenciesAccrossSubProjects = getDependencies
+  
   def isArtifact(art:Artifact) : Boolean
   
   // Build Interface

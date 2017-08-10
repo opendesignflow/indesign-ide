@@ -9,10 +9,12 @@ import scala.reflect.ClassTag
 trait ProjectHarvesterTrait extends Harvester {
   
   
-  
+  /**
+   * Return the upstream projects and their associated dependenciy
+   */
   def findUpstreamProjects(baseProject:BuildableProject) = {
     
-    var deps = baseProject.getDependencies
+    var deps = baseProject.getDependenciesAccrossSubProjects
     
     /*deps.foreach {
       f => 
@@ -21,7 +23,7 @@ trait ProjectHarvesterTrait extends Harvester {
     
     // Collect all projects which are in the tested project's dependencies
     this.getResourcesOfType[BuildableProject].collect {
-      case project if(project!=baseProject && deps.find {dep => project.isArtifact(dep.getArtifact)}.isDefined) => project 
+      case project if(project!=baseProject && deps.find {dep => project.isArtifact(dep.getArtifact)}.isDefined) => (project,deps.find {dep => project.isArtifact(dep.getArtifact)}.get) 
     }
     
   }

@@ -39,9 +39,11 @@ class IDEBaseView extends SemanticUIImplView with SemanticView with FWAppTempBuf
 
   // UI Utils
   //-----------------
-  def placePage(cl: => HTMLNode[HTMLElement, _]) = {
+  def placePage(cl: => Unit) = {
     this.definePart("page-body") {
-      cl
+      div {
+        cl
+      }
     }
   }
 
