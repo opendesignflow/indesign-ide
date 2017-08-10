@@ -33,6 +33,9 @@ import org.odfi.indesign.ide.module.maven.resolver.MavenProjectWorkspaceReader
 import org.eclipse.aether.graph.Dependency
 import org.odfi.indesign.core.harvest.fs.FileSystemIgnoreProvider
 
+/**
+ * Constructor based on base folder of maven project
+ */
 class MavenProjectResource(p: HarvestedFile) extends BuildableProjectFolder(p.path)
     with ClassDomainSupport
     with LuceneIndexResource
@@ -145,11 +148,11 @@ class MavenProjectResource(p: HarvestedFile) extends BuildableProjectFolder(p.pa
                       }
 
                       //-- Rebuild classdomain
-                      println("Replacing old CD: "+this.classdomain.get)
+                      println("Replacing old CD: " + this.classdomain.get)
                       recreateClassDomain
                       MavenProjectHarvester.findDownStreamProjects(this).foreach {
-                        p => 
-                          println(s"Replacing CD on: "+p)
+                        p =>
+                          println(s"Replacing CD on: " + p)
                           p.getDerivedResources[HarvestedResource].foreach {
                             case r if (r.getClass.getClassLoader == p.classdomain.get) =>
                               println(s"need to clean: " + r)
@@ -203,24 +206,24 @@ class MavenProjectResource(p: HarvestedFile) extends BuildableProjectFolder(p.pa
           //-- Maven Model is rebuild
           buildInProgress = true
           try {
-          MavenModule.buildMavenProject(pomFile) match {
-            case ESome(p) =>
-              buildProjectModel = ESome(p)
+            MavenModule.buildMavenProject(pomFile) match {
+              case ESome(p) =>
+                buildProjectModel = ESome(p)
 
-              //-- Rebuild Class Domain
-              buildInvalidateDependencies
+                //-- Rebuild Class Domain
+                buildInvalidateDependencies
 
-            case other: EError =>
-              buildProjectModel = other
-              addError(other.value)
-              //other.value.printStackTrace()
-              other
-            case other =>
-              buildProjectModel = other
-          }
-          
+              case other: EError =>
+                buildProjectModel = other
+                addError(other.value)
+                //other.value.printStackTrace()
+                other
+              case other =>
+                buildProjectModel = other
+            }
+
           } finally {
-             buildInProgress = false
+            buildInProgress = false
           }
 
           buildProjectModel
@@ -232,7 +235,7 @@ class MavenProjectResource(p: HarvestedFile) extends BuildableProjectFolder(p.pa
         case other =>
           other
       }
-    case true => 
+    case true =>
       ENone
   }
 
@@ -242,9 +245,9 @@ class MavenProjectResource(p: HarvestedFile) extends BuildableProjectFolder(p.pa
   override def getId = s"Maven:${p.path.toFile()}"
 
   def getProjectId = getMavenModel match {
-    case ESome(project) => s"${project.getGroupId}:${project.getArtifactId}:${project.getVersion}"
+    case ESome(project)                  => s"${project.getGroupId}:${project.getArtifactId}:${project.getVersion}"
     case other if (projectModel == null) => super.getId
-    case other => s"${projectModel.getGroupId}:${projectModel.getArtifactId}:${projectModel.getVersion}"
+    case other                           => s"${projectModel.getGroupId}:${projectModel.getArtifactId}:${projectModel.getVersion}"
   }
   override def getDisplayName = getMavenModel match {
     case ESome(project) if (project.getName != null && project.getName != "") => project.getName
@@ -254,17 +257,17 @@ class MavenProjectResource(p: HarvestedFile) extends BuildableProjectFolder(p.pa
 
   def getArtifactId = getMavenModel match {
     case ESome(project) => project.getArtifactId
-    case other => projectModel.getArtifactId
+    case other          => projectModel.getArtifactId
   }
 
   def getGroupId = getMavenModel match {
     case ESome(project) => project.getGroupId
-    case other => projectModel.getGroupId
+    case other          => projectModel.getGroupId
   }
 
   def getVersion = getMavenModel match {
     case ESome(project) => project.getVersion
-    case other => projectModel.getVersion
+    case other          => projectModel.getVersion
   }
 
   /**
@@ -366,7 +369,7 @@ class MavenProjectResource(p: HarvestedFile) extends BuildableProjectFolder(p.pa
         this.classdomain match {
 
           case Some(cd) =>
-            println(s"Discovering using cd: "+cd)
+            println(s"Discovering using cd: " + cd)
             var folder = new File(model.getBuild.getOutputDirectory).getCanonicalFile
 
             var stream = Files.walk(folder.toPath())
@@ -469,6 +472,11 @@ class MavenProjectResource(p: HarvestedFile) extends BuildableProjectFolder(p.pa
   }
 
   def getDependencies = dependencies
+  
+  override def getDependenciesAccrossSubProjects = withEmpty(getDerivedResources[MavenProjectResource]) {
+    case Some(lst) => lst.map(_.getDependencies).flatten.toList
+    case None => getDependencies
+  }
 
   def getDependenciesURL = dependenciesURLS
 
@@ -543,9 +551,7 @@ class MavenProjectResource(p: HarvestedFile) extends BuildableProjectFolder(p.pa
         maven.resolveDependencies(project) match {
           case ESome(deps) =>
 
-            
-            
-           /* var depsKey = config.get.getKey("dependencies", "files") match {
+            /* var depsKey = config.get.getKey("dependencies", "files") match {
               case Some(key) => key
               case None => config.get.addKey("depdendencies", "files")
             }
@@ -555,9 +561,11 @@ class MavenProjectResource(p: HarvestedFile) extends BuildableProjectFolder(p.pa
             deps.foreach {
               dep =>
                 println("Collected: " + dep.getArtifact.getFile)
-               // depsKey.values.add.set(dep.getArtifact.getFile.getCanonicalPath)
+              // depsKey.values.add.set(dep.getArtifact.getFile.getCanonicalPath)
             }
             
+            //-- Managed dependencies
+           
             //-- Save dependencies
             dependencies = deps
             dependenciesURLS = deps.map {
@@ -575,57 +583,33 @@ class MavenProjectResource(p: HarvestedFile) extends BuildableProjectFolder(p.pa
             println("Resolution other: " + other)
         }
 
-      /*var deps = project.getDependencies.toList.map { dep => new DefaultArtifact(dep.getGroupId, dep.getArtifactId, "jar", dep.getVersion) }
-
-        project.getArtifacts.toList.foreach {
-          dep =>
-            println("Detected dependency: "+dep+" -> ")
-        }*/
-      /*project.getDependencies.toList.foreach {
-          dep =>
-            println("Detected dependency: "+dep+" -> ")
-        }*/
-
-      //(deps, deps.map { dep => AetherResolver.resolveArtifactsFile(dep) }.filter(_.isDefined).map { _.get.toURI().toURL() })
       case other =>
-      //(List(), List())
+
     }
 
-    println("Done deps")
-    /*dependencies = result._1
-    dependenciesURLS = result._2
+    //-- Build Modules
+    rebuildModules
 
-    dependenciesURLS.foreach {
-      url =>
-        println("Created dependency: " + url)
-    }*/
+  }
 
-    //-- Rebuild ClassDomain
-    //-----------
-    //this.recreateClassDomain
+  // Sub Modules
+  //------------------
+  def rebuildModules = {
 
-    //-- Add Build output
-    //this.classdomain.get.addURL(new File(this.path.toFile(), getMavenModel.get.getBuild.getOutputDirectory).toURI().toURL())
+    this.cleanDerivedResourcesOfType[MavenProjectResource]
 
-    //-- Update Dependencies
-    //getDependenciesURL.foreach(this.classdomain.get.addURL(_))
-
-    /*dependencies = None
-    dependenciesURLS = None
-    getDependencies*/
-
-    //updateDependencies
-    //this.@->("rebuild")
-
-    /*var du = getDependenciesURL
-
-    //-- Update
-    this.compiler match {
-      case Some(comp) => comp.addClasspathURL(du.toArray)
-      case None =>
+    getMavenModel match {
+      case ESome(model) =>
+        
+        model.getModules.foreach {
+          path => 
+            
+            val r = this.addDerivedResource(new MavenProjectResource(new File(this.path.toFile(),path)))
+            r.runDirectProcess
+        }
+        
+      case other        =>
     }
-
-    du.foreach(this.classdomain.get.addURL(_))*/
 
   }
 

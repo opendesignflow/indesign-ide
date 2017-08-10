@@ -112,7 +112,8 @@ class MavenOverview extends IDEBaseView with JQueryTreetable with TasksView with
                 p("""Please find here a summary of the Detected Maven Projects""")
 
                 "ui table  treetable" :: table {
-                  thead("Name", "State", "Live Builders", "Actions", "Location")
+                  thead("Name", "Version", "Modules","State", "Live Builders", "Actions", "Location")
+                  
                   tbody {
                     projects.foreach {
                       p =>
@@ -125,6 +126,21 @@ class MavenOverview extends IDEBaseView with JQueryTreetable with TasksView with
                           //-- Name
                           td("") {
                             a(createCurrentViewLink(("project", p.getId)).toString())(text(p.getDisplayName))
+                          }
+                          
+                          //-- Version
+                          rtd {
+                            text(p.getVersion)
+                          }
+                          
+                          //-- Modules
+                          rtd {
+                            p.getDerivedResources[MavenProjectResource] match {
+                              case empty if (empty.size==0) =>
+                                text("-")
+                              case available =>
+                                text(available.size.toString)
+                            }
                           }
 
                           //-- State
@@ -180,7 +196,7 @@ class MavenOverview extends IDEBaseView with JQueryTreetable with TasksView with
 
                         //-- Dependencies
                         MavenProjectHarvester.findUpstreamProjects(p) foreach {
-                          upstreamProject =>
+                          case (upstreamProject,dep) =>
                             tr {
                               treeTableLineId(s"${p.getId}:${upstreamProject.getId}")
                               treeTableParent(p.getId)
@@ -188,7 +204,16 @@ class MavenOverview extends IDEBaseView with JQueryTreetable with TasksView with
                               td("Depends on: " + upstreamProject.getDisplayName) {
 
                               }
-
+                              
+                              // Version
+                              td(dep.getArtifact.getVersion) {
+                                
+                              }
+                              // Modules
+                              td("-") {
+                                
+                              }
+                              
                               // State
                               td("") {
 
