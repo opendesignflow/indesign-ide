@@ -270,6 +270,12 @@ class MavenProjectResource(p: HarvestedFile) extends BuildableProjectFolder(p.pa
     case other          => projectModel.getVersion
   }
 
+  def hasSnapshotDependencies = {
+    this.getDependenciesAccrossSubProjects.find {
+      d => d.getArtifact.isSnapshot()
+    }.isDefined
+  }
+  
   /**
    * On File Change, update model and invalidate dependencies
    */

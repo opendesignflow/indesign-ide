@@ -194,7 +194,7 @@ class MavenOverview extends IDEBaseView with JQueryTreetable with TasksView with
                         }
                         // EOF Project Line
 
-                        //-- Dependencies
+                        //-- Dependencies Lines
                         MavenProjectHarvester.findUpstreamProjects(p) foreach {
                           case (upstreamProject,dep) =>
                             tr {

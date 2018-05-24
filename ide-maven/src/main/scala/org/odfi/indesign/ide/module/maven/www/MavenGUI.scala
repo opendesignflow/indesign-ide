@@ -7,6 +7,7 @@ import org.odfi.wsb.fwapp.assets.AssetsResolver
 import org.odfi.indesign.ide.core.ui.contrib.IDEGUIMenuProvider
 import org.odfi.indesign.ide.module.maven.ui.MavenOverview
 import org.odfi.indesign.ide.module.maven.ui.MavenProjectView
+import org.odfi.indesign.ide.module.maven.www.release.MavenReleaseHelperView
 
 object MavenGUI extends IndesignSiteModule("/maven") with IDEGUIMenuProvider {
  
@@ -16,11 +17,12 @@ object MavenGUI extends IndesignSiteModule("/maven") with IDEGUIMenuProvider {
   //-------------------
   override def getMenuLinks= {
     
-    val projects = MavenProjectHarvester.getResourcesOfType[MavenProjectResource].map {
+    val projects =  List( ("Release Helper", s"//release/help") ) ::: MavenProjectHarvester.getResourcesOfType[MavenProjectResource].map {
       mp => 
       (mp.getDisplayName, s"/${MavenGUI.fullURLPath}/projects/${mp.getGroupId}/${mp.getArtifactId}/${mp.getVersion}")
     }.toList
-     projects ::: List( ("Release Helper", s"//release/help") )
+     
+    projects
   }
   
   // Site
@@ -32,7 +34,7 @@ object MavenGUI extends IndesignSiteModule("/maven") with IDEGUIMenuProvider {
   "/release" is {
     
     "/help" is {
-      
+      view(classOf[MavenReleaseHelperView])
     }
   }
   
