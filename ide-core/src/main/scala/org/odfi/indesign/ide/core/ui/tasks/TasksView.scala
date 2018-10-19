@@ -26,6 +26,9 @@ trait TasksView extends IndesignIDELibView with ErrorsHelpView {
   // Utilities
   //--------------
 
+  /**
+   * Create a Button to start a task associated with a resource
+   */
   def resourceTaskButton(r: HarvestedResource, id: String)(startName: String, stopName: String)(content: HeartTask[Any] => Any) = {
     taskButton(r.getId + "." + id)(startName, stopName)(content)
   }
