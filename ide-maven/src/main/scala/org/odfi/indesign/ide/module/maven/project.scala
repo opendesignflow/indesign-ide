@@ -99,7 +99,7 @@ object project {
   def apply(groupId: String, artifactId: String): Option[project] = {
 
     // Look for possibilities
-    var url = Thread.currentThread().getContextClassLoader().getResource(s"META-INF/maven/$groupId/$artifactId/pom.xml")
+    var url = Thread.currentThread().getContextClassLoader().getResource(s"maven/$groupId/$artifactId/pom.xml")
     var file = new File("pom.xml")
 
     // Resolve
